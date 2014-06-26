@@ -1,0 +1,157 @@
+/* app css stylesheet */
+
+body
+{
+  background-color:#426262;
+  color:white;
+  margin:1px;
+}
+
+.navimenu
+{
+  width:100%;
+  /*height:11vh;*/
+  margin-bottom:2px;
+  display:block;
+}
+
+.navimenu > div
+{
+  background-color:Red;
+  float:left;
+  width:33.33%;
+  font-size:5vw;
+  text-align:center;
+}
+
+.navimenu > div:hover
+{
+  cursor:pointer;
+  background-color:silver;
+}
+
+
+#map
+{
+   height:85%;
+   width:100%;
+   min-height:80vh;
+   min-width:80vw;
+}
+
+#verho
+{
+  display:none;
+  position:absolute;
+  top:0px;
+  left:0px;
+  width:100vw;
+  height:100vh;
+  z-index:1001;
+  background-color:silver;
+}
+
+#popup
+{
+  width:60vw;
+  margin:10px auto;
+  z-index:1002;
+}
+#noty
+{
+	width:100vw;
+	max-width:100%;
+}
+.noty_message
+{
+	z-index:10020;
+}
+.noty_buttons 
+{
+	
+	
+	
+}
+.noty_buttons > .btn
+{
+	
+	font-size:24px;
+	width:40%;
+	margin-right:5px;
+}
+.btn-primary
+{
+	background-color:lightgreen;
+}
+.btn-danger
+{
+	background-color:Red;
+}
+.noty_text
+{
+	font-size:24px;
+}
+#frontPage > ul
+{
+  margin:0px;
+  -webkit-padding-start:0px;
+}
+
+#frontpage > ul > li
+{
+  list-style-type: none;
+  margin:10px 0px;
+}
+
+#frontPage > ul > li > input[type=button]
+{
+  width:100%;
+  font-size:8vw;
+}
+
+input[type=button]
+{
+  width:100%;
+  font-size:8vw;
+}
+
+#etaisyys
+{
+  float:right;
+}
+
+.optionsList > li
+{
+	padding: 2vh 1vw;
+	height:10vh;
+	
+}
+
+.options, .kieli
+{
+  
+  min-height:40px;
+  text-align:center;
+}
+
+.options
+{
+  font-size: 5vw;
+  height:15vh;
+}
+
+.kieli > img
+{
+  width:25vw;
+  margin:2vw 6vw;
+}
+
+.mycluster {
+      min-width: 80px;
+      min-height: 40px;
+      background-color: greenyellow;
+      text-align: center;
+      font-size: 24px;
+      z-index:10000;
+      display:block;
+    }

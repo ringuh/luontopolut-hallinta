@@ -1,0 +1,66 @@
+Hallinta:
+
+Luo rata
+	-> Nimi
+
+Valitse rata
+	-> Map Page
+
+Map Page:
+	-> Muokkaa radan nimeä/osoitetta
+	-> POISTA rata
+	-> Lisää kohde
+	-> poista kohde
+	-> tallenna kohteet
+	-> trackaa reittiä
+	-> POISTA reitti
+	-> tallenna reitti
+
+Valitse Merkki:
+	-> valitse sivu
+	-> valitse tyyppi ( kohde, vessa, aloituspaikka, lopetus )
+	-> valitse IKONI
+	-> vaihda järjestysnro
+	-> hälytysraja ( 0 for no alarm )
+	-> clickable
+
+Luo sivu:
+	-> Lisää tiedostot
+	-> Valitse kieli
+		-> Luo html
+	-> valmis pohja?
+
+	
+	
+
+Rata includes:
+	-> id
+	-> Nimi	
+	-> AloitusOSOITE
+	-> Kohteiden lukumäärä
+	-> TAGIT
+	-> reitin pituus
+	-> korkeuskäyrä
+	-> kohteet
+	-> reitti
+
+Kohde includes:
+	-> id
+	-> ratakey
+	-> Nimi
+	-> Järjestysnumero
+	-> latlng
+	-> oletussivu?
+
+REITTI includes:
+	-> id
+	-> ratakey
+	-> latlng
+	-> altitude
+
+SIVU includes:
+	-> id
+	-> nimi
+	-> html?
+	-> kieli?
+	

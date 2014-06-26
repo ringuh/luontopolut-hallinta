@@ -1,0 +1,29 @@
+
+
+
+
+	
+	<div id="verho">
+		<div id="popup">
+			<p> moi oon verho</p>
+			<ul>
+				<li ng-repeat="sivu in sivuVaihtoehdot">{{sivu.id}}-{{sivu.tunniste}}
+					<input type="button" ng-click="selectForMarker(sivu)" ng-show="sivu.id != valittuSivu" value="Valitse" />
+				</li>
+			</ul>
+			<input type="button" value="Sulje" ng-click="verhoHide()" />
+		</div>
+	</div>
+	<div id="noty"></div>
+	<div id="etaisyys">etaisyys</div>
+	<div id="map"></div>
+
+	
+	<!--<span id="marksCount"></span>"{{reittiPiirto}}"
+	<!--<input type="button" ng-click="track()" value="track me" />-->
+	<!--<input type="button" ng-click="reittiPiirto = !reittiPiirto" value="Piirrä reitti" />-->
+	<!--<input type="button" ng-click="tallennaReitti()" value="Tallenna reitti" />
+	<input type="button" ng-click="tyhjennaReitti()" value="Poista reitti kannasta" />
+	<!--<input type="button" ng-click="lisaaMerkki()" value="Lisää merkki omaan sijaintiisi" />-->
+	<!--<input type="button" ng-click="tallennaMerkit()" value="Tallenna kartta" />-->
+	

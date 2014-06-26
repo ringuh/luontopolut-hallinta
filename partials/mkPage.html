@@ -1,0 +1,26 @@
+<p> make page {{moi}}</p>
+<select ng-model="sivuSpinner" ng-init="sivuSpinner = -1" ng-change="sivuValittu()" >
+<option value="-1" > Uusi sivu </option>
+<option ng-repeat="sivu in sivut"  ng-value={{sivu.id}} ng-selected="select == sivu.id">{{sivu.tunniste}}</option>
+</select>
+<form ng-submit="savePage()">
+	<input type="text" ng-model="sivuNimi" placeholder="Sivun tunniste" required />
+	<br/>
+	<textarea ng-model="tekstiKentta" required></textarea>
+	<div id="preview">{{tekstiKentta}}</div>
+	<input type="submit" value="Tallenna sivu" />
+</form>
+
+<div ng-hide="sivuSpinner == '-1'" >
+	<h3> Lisää tiedosto </h3>
+	<form action="{{rajapinta_}}" method="post"
+		enctype="multipart/form-data">
+		<label for="file">Filename:</label>
+		<input type="file" name="file" id="file"><br>
+		<input type="text" ng-hide="sivuSpinner != '-2'" name="id" value="{{sivuSpinner}}">
+		<input type="submit" name="Kuva" value="Lähetä kuva">
+	</form>
+	<ul>
+	<li ng-repeat="tiedosto in kuvat" ><span>{{tiedosto}}</span></li>
+	</ul>
+</div>
