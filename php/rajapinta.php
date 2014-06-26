@@ -4,60 +4,52 @@
 
 	$cmd = $_REQUEST['cmd'];
 	$id = $_REQUEST['id'];
-	$paikka = $_REQUEST['paikka'];
-	$latitude = $_REQUEST['latitude'];
-	$longitude = $_REQUEST['longitude'];
 	$value = $_REQUEST['value'];
-	$tunniste = $_REQUEST['tunniste'];
+	
 
 	$db;
 
 	//echo json_encode( $_REQUEST );
 
-	if( isset($cmd) )
-		$db = new DBTalker();
+	
+	
+	try{
+		if( isset($cmd) ) // alustetaan PDO
+			$db = new DBTalker();
+		
+		if( $cmd == "addRata" && isset($id)) // lisää radan
+			$db->AddRata($id);
+		// editoidaan rataa. nimeä ja osoitetta. 
+		else if( $cmd == "editRata" && isset($id) && isset(	$value ) && isset( $_REQUEST['osoite'] ) )
+			$db->EditRata($id, $value, $_REQUEST['osoite'] );
+		else if( $cmd == "getRadat" ) // haetaan kaikki radat
+			$db->GetRadat();
+		else if( $cmd == "getPages" ) // haetaan kaikki sivut
+			$db->GetSivut();
+		else if( $cmd == "removePage" && isset($id) ) // poistetaan sivu
+			$db->DeleteSivu( $id );
+		else if( $cmd == "addPage" && isset( $value ) )
+			$db->AddSivu( $value );
+		
+			
+			
+			
+			
+		else
+			echo "else $cmd";
 
-	if( $cmd == "addPaikka" && isset($paikka))
-		$db->AddPlace($paikka);
+	
+	
+	}
+	catch( Exception $e )
+	{
+		echo "Error catch: ".$e->getMessage();
+	}
 
-	else if( $cmd == "getPaikat")
-		$db->GetPlaces();
-
-	else if( $cmd == "addSpot" && isset($id) && isset($latitude) && isset($longitude))
-		$db->AddSpot( $id, $latitude, $longitude );
-
-	else if( $cmd =="getSpots" && isset($id))
-		$db->GetSpots($id);
-
-	else if( $cmd == "addSpotValue" && isset($id) && isset($value))
-		$db->AddSpotValue($id, $value);
-
-	else if( $cmd == "getSpotValue" && isset( $id ))
-		$db->GetSpotValue($id);
-	else if( $cmd == "resetPaikka" && isset( $id ))
-		$db->ResetSpot($id);
-	else if( $cmd == "savePage" && isset($value ) && isset( $tunniste ) )
-		$db->SavePage( $id, $value, $tunniste );
-	else if( $cmd == "getPages" )
-		$db->GetPages();
-	else if( $cmd == "getPage" && isset( $id ) )
-		$db->GetPage($id);
-	else if( $cmd == "getPageLinked" && isset( $id ) )
-		$db->GetPageLinked( $id );
-	else if( $cmd == "linkPages" && isset( $id ) && isset( $value ) )
-		$db->LinkPages( $id, $value );
-	else if( $cmd == "addReitti" && isset( $id ) && isset( $value ) )
-		$db->AddReitti( $id, $value );
-	else if( $cmd == "getReitti" && isset( $id ) )
-		$db->GetReitti( $id ) ;
-	else if( $cmd == "offline" )
-		$db->Offline();
-	else if( $cmd =="haeTiilit")
-		$db->GetTiles();
 	
 		
 		
-		
+	/*	
 	else if( isset( $_REQUEST['Kuva'] ) )
 	{
 		echo json_encode( $_REQUEST )."<hr>";
@@ -95,3 +87,4 @@
 		  echo "Invalid file";
 		}
 	}
+	*/

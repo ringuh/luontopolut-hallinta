@@ -64,3 +64,8 @@ SIVU includes:
 	-> html?
 	-> kieli?
 	
+drop table tlp_kohde;
+drop table tlp_sivu;
+drop table tlp_reitti;
+drop table tlp_rata_tagit;
+drop table tlp_rata;

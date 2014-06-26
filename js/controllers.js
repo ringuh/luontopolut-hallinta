@@ -7,11 +7,10 @@ appCtrl.controller('FrontCtrl', ['$scope', '$http', '$location', 'siirto', funct
 	var rajapinta_ = siirto.rajapinta;
 	
 
-	$http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
 
-		var getPaikat = function(){ $http.post( rajapinta_, { cmd: "getPaikat"})
-		.success( function(data){
-			//alert( data );
+	var getPaikat = function(){ $http.post( rajapinta_, { cmd: "getRadat"})
+	.success( function(data){ // haetaan lista kohteista
+			
 			$scope.alueet = data;
 		})
 		.error( function()
@@ -20,17 +19,19 @@ appCtrl.controller('FrontCtrl', ['$scope', '$http', '$location', 'siirto', funct
 		});
 	}
 
-	$scope.makeAlue = function(){
+	$scope.makeAlue = function(){	// luodaan uusi rata
 		
-		$http.post( rajapinta_, { cmd: "addPaikka", paikka: $scope.uusiAlue })
+		$http.post( rajapinta_, { cmd: "addRata", id: $scope.uusiAlue })
 		.success( function(data){
 			if( data.indexOf("success") != -1 )
-			{
-				
-				$location.path("/asd");
+			{	// reloadataan paikat, mikäli onnistuttiin
+				$scope.uusiAlue = "";	
+				getPaikat();
 			}
 			else
-				alert( data );
+				$('#noty').noty({text: data, type:"error", timeout:"2000", dismissQueue:false});
+				
+				
 		})
 		.error( function(){
 			alert( "error");
@@ -38,11 +39,15 @@ appCtrl.controller('FrontCtrl', ['$scope', '$http', '$location', 'siirto', funct
 	};
 
 	$scope.valitse = function(alue){
-		siirto.alue = alue.ID;
+		siirto.alue = alue.id;
+
 		$location.path("/map");
 	};
-		
-	getPaikat();
+	
+	$(document).ready(function(){
+		getPaikat();
+	});	
+	
 }]);
   
 
