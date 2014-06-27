@@ -155,3 +155,50 @@ input[type=button]
       z-index:10000;
       display:block;
     }
+
+#mkPage
+{
+  
+  min-width:200px;
+  width:99%;
+  max-width:800px;
+  margin:0px auto;
+  font-size:22px;
+}
+
+#mkPage > select
+{
+  font-size:5vw;
+  width:100%;
+  margin:20px 0px;
+  cursor:pointer;
+}
+#mkPage input, #mkPage textarea
+{
+  font-size:4vw;
+  min-width:200px;
+  width:100%;
+  max-width:800px;
+}
+
+#mkPage textarea
+{
+  margin-top:10px;
+  border:none;
+  min-height:200px;
+  height:40vh;
+}
+
+#mkPage input[type=submit]
+{
+  border:2px solid black;
+  width:100%;
+  cursor:pointer;
+}    
+#preview
+{
+  margin-top:20px;
+  border:2px solid black;
+  width:100%;
+  min-height:100px;
+}

@@ -1,5 +1,5 @@
 appCtrl.controller('mkPageCtrl', ['$scope', 'siirto', '$http', '$route', function($scope, siirto, $http, $route ) {
- 	$scope.moi = "jou mkpage";
+ 	
  	var id = "";
  	var rajapinta_ = siirto.rajapinta;
  	$scope.rajapinta_ = siirto.rajapinta;
@@ -11,22 +11,27 @@ appCtrl.controller('mkPageCtrl', ['$scope', 'siirto', '$http', '$route', functio
  	$scope.savePage = function(){
  		//alert("save"+rajapinta_);
  		$http.post( rajapinta_, { 
- 			cmd: "savePage", value: $scope.tekstiKentta, 
+ 			cmd: "savePage", value: $scope.tekstiKentta, eng: $scope.textArea,
  			id: $scope.sivuSpinner, tunniste: $scope.sivuNimi 
  		})
 		.success( function(data){
-				alert( data );
-				
-				init();
+			//alert( data );
+			
+			//init();
 
-				if( !isNaN(data) )
-					$scope.select = data;
-				else
-					alert( data );
+			if( !isNaN(data) )
+			{
+				$scope.select = data;
+				$('#noty').noty({text: "Sivu tallennettiin", type:"success", timeout:"2000", dismissQueue:false});
 
+			}
+			else
+				$('#noty').noty({text: data, type:"error", timeout:"2000", dismissQueue:false});
+
+			init();
 		})
 		.error( function(){
-			alert( "error");
+			$('#noty').noty({text: "Virhe: sivua ei tallennettu", type:"error", timeout:"2000", dismissQueue:false});
 		});
  	};
 
@@ -34,23 +39,30 @@ appCtrl.controller('mkPageCtrl', ['$scope', 'siirto', '$http', '$route', functio
  		var nro = $scope.sivuSpinner;
  		$scope.sivuNimi = "";
  		$scope.tekstiKentta = "";
- 		if( nro != -1)
- 			$http.post( rajapinta_, { 
-	 			cmd: "getPage", id: nro
-	 		})
+ 		$scope.textArea = "";
+ 		if( nro == -1) // ei tehdä hakuja, mikäli ollaan lisäämässä uutta sivua
+ 			return;
+
+ 		for( var i in $scope.sivut) // haetaan oikea tunniste
+ 		{
+ 			if( $scope.sivut[i].id == nro)
+ 				$scope.sivuNimi = $scope.sivut[i].nimi;
+ 		}
+ 		$http.post( siirto.php+"upload/"+nro+"/index.html") // haetaan suomiteksti
 			.success( function(data){
-				$scope.select = nro;
-				
-				
-				$scope.sivuNimi = data["stuff"][0].tunniste;
-				$scope.tekstiKentta = data["html"];
-				$scope.kuvat = data['dir'];
-				alert( JSON.stringify(data['dir']));
+				$scope.tekstiKentta = data;
 			})
 			.error( function(){
-				alert( "error");
-			});
-		
+				$('#noty').noty({text: "Virhe: tietojen lataus epäonnistui", type:"error", timeout:"2000", dismissQueue:false});
+		});
+
+		$http.post( siirto.php+"upload/"+nro+"/index_eng.html") // haetaan english
+			.success( function(data){
+				$scope.textArea = data;
+			})
+			.error( function(){
+				$('#noty').noty({text: "Virhe: tietojen lataus epäonnistui", type:"error", timeout:"2000", dismissQueue:false});
+		});	
 
  	};
 

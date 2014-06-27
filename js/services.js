@@ -10,5 +10,6 @@ appService.value('version', '0.1');
 
 appService.service('siirto', function(){
 	this.alue = 9;
-	this.rajapinta = "http://ohjryhma1.projects.tamk.fi/maps/v2/luontopolut-hallinta/php/rajapinta.php";
+	this.php = "http://ohjryhma1.projects.tamk.fi/maps/v2/luontopolut-hallinta/php/";
+	this.rajapinta = this.php+"rajapinta.php";
 });

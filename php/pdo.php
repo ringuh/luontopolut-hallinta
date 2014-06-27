@@ -51,7 +51,7 @@
 				drop table tlp_rata;
 			
 			*/
-				// poistetaan rataan liittyv�t viitteet
+				// poistetaan rataan liittyvät viitteet
 				$this->DeleteKohde( null, $id );
 				$this->DeleteReitti( $id );
 				$this->DeleteTagit( $id );
@@ -86,6 +86,50 @@
 			echo json_encode( $sth->fetchAll(PDO::FETCH_CLASS) );			
 		}
 		
+		function SaveSivu( $id, $value, $eng, $tunniste )
+		{
+			
+			$saveID = -1;
+			
+			if( $id == -1 )
+			{
+				$str = "INSERT INTO $this->sivu_ ( nimi ) values ( :tunniste )";
+				$sth = $this->db->prepare($str);
+					
+				$sth->bindParam(':tunniste', $tunniste, PDO::PARAM_STR );
+				$sth->execute();
+
+				if( $sth->rowCount() == 1)
+					echo $saveID = $this->db->lastInsertId();
+				else
+					throw new Exception("Sivun tallennus epäonnistui");
+			}
+			else
+			{
+				$str = "UPDATE $this->sivu_ SET nimi=:tunniste WHERE id=:id";
+				
+				$sth = $this->db->prepare($str);
+				$sth->bindParam(':id', $id, PDO::PARAM_INT );
+				$sth->bindParam(':tunniste', $tunniste, PDO::PARAM_STR );
+				$sth->execute();
+				$saveID = $id;
+				
+				echo $id;
+			}
+			
+			if( $saveID > -1 ) // mikäli rivi onnistuttiin lisäämään, tallennetaan tiedostot
+			{
+				if (!file_exists("upload"))
+					mkdir("upload");
+				
+				if (!file_exists("upload/$saveID"))
+					mkdir("upload/$saveID");
+				
+				file_put_contents( "upload/$saveID/index.html", $value );
+				file_put_contents( "upload/$saveID/index_eng.html", $eng );
+				
+			}
+		}
 		
 		
 		function DeleteKohde( $id, $rataid )
@@ -97,7 +141,7 @@
 				$sth = $this->db->prepare($str);
 				$sth->bindParam(':nimi', $rataid, PDO::PARAM_STR, 45);
 			}
-			else // poistetaan vain yksi yksitt�inen merkki
+			else // poistetaan vain yksi yksittäinen merkki
 			{
 				$str = "delete from $this->kohde_ where id = :nimi";
 				$sth = $this->db->prepare($str);

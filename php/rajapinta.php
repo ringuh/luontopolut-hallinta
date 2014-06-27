@@ -28,10 +28,12 @@
 			$db->GetSivut();
 		else if( $cmd == "removePage" && isset($id) ) // poistetaan sivu
 			$db->DeleteSivu( $id );
-		else if( $cmd == "addPage" && isset( $value ) )
-			$db->AddSivu( $value );
-		
-			
+		else if( $cmd == "savePage" && isset( $value ) )
+			$db->SaveSivu( $id, $value, $_REQUEST["eng"], $_REQUEST["tunniste"] );
+			/*
+		cmd: "savePage", value: $scope.tekstiKentta, eng: $scope.textArea,
+ 			id: $scope.sivuSpinner, tunniste: $scope.sivuNimi 
+			*/
 			
 			
 			
