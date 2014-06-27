@@ -222,3 +222,9 @@ input[type=button]
   width:auto;
   font-size:3vw;
 }
+
+.right
+{
+  float:right;
+  
+}
