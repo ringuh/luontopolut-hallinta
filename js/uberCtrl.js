@@ -1,27 +1,14 @@
-/*
- * Leaflet plugin to create map icons using Maki Icons from MapBox.
- *
- * References:
- *   Maki Icons: https://www.mapbox.com/maki/
- *   MapBox Marker API: https://www.mapbox.com/developers/api/static/#markers
- *
- * Usage:
- *   var icon = L.MakiMarkers.icon({icon: "rocket", color: "#b0b", size: "m"});
- *
- * License:
- *   MIT: http://jseppi.mit-license.org/
- */
- /*global L:false */
+'use strict';
 
- /*
+appCtrl.controller('uberCtrl', ['$scope', 
+	function($scope){
+	
+		$scope.uber = "uuuber";
 
-    jostain täysin tuntemattomasta syystä kyseinen koodi ei toimi controllerin ulkopuolelta
-    lisätty UBERCONTROLLERIIN
- */
- /*
-(function () {
+		$("#noty").html("jou");
+				(function () {
   "use strict";
-  
+
   L.MakiMarkers = {
     // Available Maki Icons
     icons: ["airfield","airport","alcohol-shop","america-football","art-gallery","bakery","bank","bar",
@@ -109,11 +96,11 @@
       options.iconRetinaUrl = L.MakiMarkers.apiUrl + pin + "@2x.png";
     }
   });
-
-  L.MakiMarkers.Icon = function(options) {
-    
-    return new L.MakiMarkers.Icon(options);
+	
+  L.MakiMarkers.icon = function(options) {
+   
+    	return new L.MakiMarkers.Icon(options);
+    	
   };
 })();
-
-*/
+}]);
