@@ -14,12 +14,12 @@
 	
 	
 	try{
-		if( isset($cmd) ) // alustetaan PDO
+		if( isset($cmd) || isset( $_REQUEST['tiedosto'])) // alustetaan PDO
 			$db = new DBTalker();
 		
-		if( $cmd == "addRata" && isset($id)) // lisää radan
+		if( $cmd == "addRata" && isset($id)) // lisÃ¤Ã¤ radan
 			$db->AddRata($id);
-		// editoidaan rataa. nimeä ja osoitetta. 
+		// editoidaan rataa. nimeÃ¤ ja osoitetta. 
 		else if( $cmd == "editRata" && isset($id) && isset(	$value ) && isset( $_REQUEST['osoite'] ) )
 			$db->EditRata($id, $value, $_REQUEST['osoite'] );
 		else if( $cmd == "getRadat" ) // haetaan kaikki radat
@@ -30,10 +30,17 @@
 			$db->DeleteSivu( $id );
 		else if( $cmd == "savePage" && isset( $value ) )
 			$db->SaveSivu( $id, $value, $_REQUEST["eng"], $_REQUEST["tunniste"] );
-			/*
-		cmd: "savePage", value: $scope.tekstiKentta, eng: $scope.textArea,
- 			id: $scope.sivuSpinner, tunniste: $scope.sivuNimi 
-			*/
+		else if( isset( $_REQUEST['tiedosto'] ) )
+			$db->SaveFile( $id );
+		else if( $cmd == "getTiedostot" && isset( $id ))
+			$db->GetFiles( $id );
+		else if( $cmd == "poistaTiedosto" && isset( $id ) && isset( $value ) )
+			$db->DeleteFile( $id, $value );
+		else if( $cmd == "poistaTiedosto" && isset( $id ) )
+			$db->DeleteFile( $id, null );
+			
+			
+			
 			
 			
 			

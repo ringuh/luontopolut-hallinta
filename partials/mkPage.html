@@ -1,6 +1,6 @@
 
 <div id="mkPage">
-
+{{select}}
 	<select ng-model="sivuSpinner" ng-init="sivuSpinner = -1" ng-change="sivuValittu()" >
 	<option value="-1" > Uusi sivu </option>
 	<option ng-repeat="sivu in sivut"  ng-value={{sivu.id}} ng-selected="select == sivu.id">{{sivu.nimi}}</option>
@@ -15,18 +15,21 @@
 	</form>
 
 	<div id="preview">Esikatselukenttä:<br/>{{tekstiKentta}}</div>
+	<input type="button" ng-hide="sivuSpinner == '-1'" class="smallButton" ng-click="poistaSivu()" value="Poista sivu" />
+
 	<p ng-hide="sivuSpinner != '-1'"> tallenna sivu lisätäksesi tiedostoja </p>
 	<div ng-hide="sivuSpinner == '-1'" >
-		<h3> Lisää tiedosto </h3>
+		<h3> Tiedostot: </h3>
+		<table>
+			<tr ng-repeat="tiedosto in kuvat" ><td><a target="_blank" href="{{php}}/{{tiedosto}}">{{tiedosto}}</a></td><td><input type="button" class="smallButton" value="Poista" ng-click="poistaTiedosto(tiedosto)"></td></tr>
+		</table>
 		<form action="{{rajapinta_}}" method="post"
 			enctype="multipart/form-data">
 			<label for="file">Filename:</label>
 			<input type="file" name="file" id="file"><br>
 			<input type="text" ng-hide="sivuSpinner != '-2'" name="id" value="{{sivuSpinner}}">
-			<input type="submit" name="Kuva" value="Lähetä kuva">
+			<input type="submit" name="tiedosto" value="Lisää kuva">
 		</form>
-		<ul>
-		<li ng-repeat="tiedosto in kuvat" ><span>{{tiedosto}}</span></li>
-		</ul>
+		
 	</div>
 </div>

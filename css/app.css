@@ -202,3 +202,23 @@ input[type=button]
   width:100%;
   min-height:100px;
 }
+
+#mkPage td a, #mkPage td a:visited
+{
+  font-size:4vw;
+  /*text-decoration: none;*/
+  color:inherit;
+  padding:10px;
+}
+#mkPage table
+{
+  margin-bottom:20px;
+}
+
+#mkPage .smallButton
+{
+  margin:10px;
+  background-color:Red;
+  width:auto;
+  font-size:3vw;
+}

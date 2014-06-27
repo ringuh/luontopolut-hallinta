@@ -185,7 +185,7 @@
 		{
 			$str = "delete from $this->sivu_ where id = :nimi";
 			$sth = $this->db->prepare($str);
-			$sth->bindParam(':nimi', $rataid, PDO::PARAM_STR, 45);
+			$sth->bindParam(':nimi', $id, PDO::PARAM_STR, 45);
 			$sth->execute();
 			
 			if( $sth->rowCount() > 0)
@@ -194,7 +194,95 @@
 				echo "DeleteSivut - rowcount0<hr>";
 		}
 		
+		function GetFiles( $id )
+		{
+			
+			if( $id == -1 )
+			{
+				echo json_encode( array() );
+				return $id;
+			}
+			else
+			{
+				$dir = "upload/$id";
+				$files = array_diff(scandir($dir), array('.','..','Thumbs.db', 'index.html', 'index_eng.html'));
+				
+				echo json_encode($files);
+			}
+		}
 		
+		function DeleteFile( $id, $value )
+		{
+			
+			if( $value == null )
+			{
+				echo "nullissa $id, $value";
+				$dir = 'upload' . DIRECTORY_SEPARATOR . $id;
+				$it = new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS);
+				$files = new RecursiveIteratorIterator($it,
+							 RecursiveIteratorIterator::CHILD_FIRST);
+				foreach($files as $file) {
+					if ($file->getFilename() === '.' || $file->getFilename() === '..') {
+						continue;
+					}
+					if ($file->isDir()){
+						rmdir($file->getRealPath());
+					} else {
+						unlink($file->getRealPath());
+					}
+				}
+				rmdir($dir);
+				
+				
+				$this->DeleteSivu( $id );
+			}
+			else
+			{
+				$dir = 'upload' . DIRECTORY_SEPARATOR . $id. DIRECTORY_SEPARATOR .$value;
+				if( file_exists( $dir ) )
+					unlink( $dir );
+				echo "poistettiin $value";	
+			}
+			
+			
+		}
+		
+		function SaveFile($id)
+		{
+			$allowedExts = array("gif", "jpeg", "jpg", "png");
+			$temp = explode(".", $_FILES["file"]["name"]);
+			$extension = end($temp);
+			if (!file_exists("upload/")) {
+						mkdir("upload/");
+			}
+			$baseUrl = "upload/$id/";
+			if ((($_FILES["file"]["type"] == "image/gif")
+			|| ($_FILES["file"]["type"] == "image/jpeg")
+			|| ($_FILES["file"]["type"] == "image/jpg")
+			|| ($_FILES["file"]["type"] == "image/pjpeg")
+			|| ($_FILES["file"]["type"] == "image/x-png")
+			|| ($_FILES["file"]["type"] == "image/png"))
+			&& ($_FILES["file"]["size"] < 2000000)
+			&& in_array($extension, $allowedExts)) {
+			  if ($_FILES["file"]["error"] > 0) {
+				echo "Return Code: " . $_FILES["file"]["error"] . "<br>";
+			  } else {
+				echo "Upload: " . $_FILES["file"]["name"] . "<br>";
+				echo "Type: " . $_FILES["file"]["type"] . "<br>";
+				echo "Size: " . ($_FILES["file"]["size"] / 1024) . " kB<br>";
+				echo "Temp file: " . $_FILES["file"]["tmp_name"] . "<br>";
+				if (file_exists($baseUrl . $_FILES["file"]["name"])) {
+				  echo $_FILES["file"]["name"] . " already exists. ";
+				} else {
+				  move_uploaded_file($_FILES["file"]["tmp_name"],
+				   $baseUrl . $_FILES["file"]["name"]);
+				  echo "Stored in: " . $baseUrl . $_FILES["file"]["name"];
+				}
+			  }
+			} else {
+			  echo "Invalid file";
+			}
+		}
 	}
 
 ?>
