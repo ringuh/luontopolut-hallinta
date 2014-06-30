@@ -138,7 +138,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 		     	radius = 5;
 		     
 		     radius = radius * (20 - self.map.getZoom())*4;
-		     henkilo.gpsSpot.setRadius(radius);
+		     //henkilo.gpsSpot.setRadius(radius);
 		}
 		
 		this.MerkitLkm = function()
@@ -251,7 +251,8 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 		this.addMerkki = false;
 
 		var location = [61.497649,23.784156];
-		this.gpsSpot =	L.circle(location, 2000);
+		//this.gpsSpot =	L.circle(location, 2000);
+		this.gpsSpot = L.userMarker(location,{pulsing:true, accuracy:100, smallIcon:true});
 
 
 		this.setGps = function(bool)
@@ -279,6 +280,8 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 
 		this.setLocation = function(e)
 		{
+			self.gpsSpot.setAccuracy(e.accuracy);
+			
 			console.log("Henkilo:setLocation");
 			location = [ e.latlng.lat, e.latlng.lng ];
 			
