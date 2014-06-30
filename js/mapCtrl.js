@@ -9,18 +9,27 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 	var henkilo = new Henkilo();
 	var kartta = new Kartta(henkilo);
 	
-	var iconi;
+	
 	var plus = 0;
 	
 	
 	function init()
 	{
-		iconi = L.MakiMarkers.icon({icon: "rocket", color: "#b0b", size: "m"});
+		
 		kartta.addLayer();
 		kartta.controllerit();
 
 		
 		
+	}
+
+	$scope.verhoHide = function(){
+		$("#verho").fadeOut("slow");
+	};
+
+	function openVerho(){
+		$("#verho").fadeIn("slow");
+
 	}
 	
 	
@@ -29,13 +38,16 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 
 	function Kartta(henkilo)
 	{
+		console.log( "Kartta constructor");
 		var self = this;
 		this.tiilit = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 		this.southWest = L.latLng(60.0, 22.73);
     	this.northEast = L.latLng(62.48, 24.83);
     	this.minZoom = 10;
     	this.maxZoom = 19;
+    	
     	this.gps = false;
+    	var merkit = [];
     	
 
     	this.tileLayer = L.tileLayer( this.tiilit, { 
@@ -60,6 +72,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 		
 		this.controllerit = function()
 		{
+			console.log("Kartta: controllerit");
 			self.map.addControl( new L.Control.Track() );
 			self.map.addControl( new L.Control.Marker() );
 			//map.addControl( new L.Control.Reitti() );
@@ -68,59 +81,89 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 			//map.addControl( new L.Control.DeleteReitti() );
 		};
 		
+		
 		this.addLayer = function(){
+			console.log("Kartta: addLayer");
 			henkilo.setKartta(this.map);
 			this.tileLayer.addTo(this.map);
 			
-
-			setTimeout( function(){
-				
-				//henkilo.gpsSpot.setRadius(20000);
-				
-			}, 2000);
+			
 		};
 
 		this.removeLayer = function()
 		{
+			console.log("Kartta: removeLayer");
 			this.map.removeLayer(this.tileLayer);
 		};
 
 		this.locate = function(bool)
 		{	// mikäli syötetään true kartta siirtyy gps mukana
-			this.map.stopLocate(); // tapetaan edellinen haku
-			this.map.locate( {
+			console.log("Kartta: locate zlvl: "+self.map.getZoom());
+			if( !henkilo.getGps())
+				return;
+
+			self.map.stopLocate(); // tapetaan edellinen haku
+			
+			self.map.locate( {
 						watch:true,setView: bool, 
-						maxZoom:kartta.map.getZoom(), maximumAge:500, 
+						maxZoom:self.map.getZoom(), maximumAge:500, 
 						enableHighAccuracy: true 
 					} ); // avataan uusi haku
+			
+			
 		};
 		
 		this.lisaaMerkki = function()
 		{
+			console.log("Kartta:lisaaMerkki");
 			henkilo.addMerkki = true;
-			self.map.addLayer(henkilo.gpsSpot);
+			henkilo.setGps(true);
 			self.locate();
 		}
-
+		
 		function onZoomend(){
 			// tapahtuu, kun zoomaus päättyy
 			// currently: säätää "omalokaatio-ympyrän" piirtosädettä METREISSÄ
+			console.log("Kartta: onZoomend "+self.map.getZoom());
 			
 			self.locate(true); // for now avataan aina uusi tracki, jotta maxZoom lvl olisi haluttu
 	     	var radius = 2;
-	     	if( kartta.map.getZoom() < 11)
+	     	if( self.map.getZoom() < 11)
 	     		radius = 30;
-	     	else if( kartta.map.getZoom() < 13)
+	     	else if( self.map.getZoom() < 13)
 	     		radius = 20;
-	     	else if( kartta.map.getZoom() < 15)
+	     	else if( self.map.getZoom() < 15)
 	     		radius = 10;
-	     	else if( kartta.map.getZoom() < 17)
+	     	else if( self.map.getZoom() < 17)
 		     	radius = 5;
 		     
-		     radius = radius * (20 - kartta.map.getZoom())*4;
+		     radius = radius * (20 - self.map.getZoom())*4;
 		     henkilo.gpsSpot.setRadius(radius);
 		}
 		
+		this.MerkitLkm = function()
+		{
+			return merkit.length;
+		};
+
+		this.AddMerkki = function(e)
+		{
+			if( merkit.indexOf(e) == -1)
+				merkit.push(e);
+			else
+				alert("merkki oli jo");
+		};
+
+		this.RemoveMerkki = function(e)
+		{
+			for( var i in merkit )
+			{
+				if( merkit[i] == e )
+				{
+					merkit.splice(i, 1);					
+				}
+			}
+		};
 
 
 		/*
@@ -145,7 +188,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 					{
 						
 						self.locate(); // paikallistetaan
-						self.map.addLayer(henkilo.gpsSpot); // lisätään sijaintirinkula
+						
 						
 					}
 					else
@@ -183,7 +226,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 					.addListener(controlDiv, 'click', L.DomEvent.preventDefault)
 				.addListener(controlDiv, 'click', function () { 
 					self.lisaaMerkki();
-					var n = $('#noty').noty({text: 'Merkki lisätty sijaintiisi!', type:"success", timeout:"2000", dismissQueue:false});
+					
 					
 				});
 
@@ -213,28 +256,34 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 
 		this.setGps = function(bool)
 		{
+			console.log("Henkilo:setGps");
 			if(bool)
 				gps = true;
 			else
 				gps = !gps;
 
+			console.log("Henkilo:return gps "+gps);
 			return gps;
 		};
 
 		this.getGps = function()
 		{
+			console.log("Henkilo:getGps");
 			return gps;
 		}
 
 		this.setKartta = function(m){
+			console.log("Henkilo:setKartta");
 			map = m;
 		}
 
 		this.setLocation = function(e)
 		{
-			
+			console.log("Henkilo:setLocation");
 			location = [ e.latlng.lat, e.latlng.lng ];
 			
+			map.removeLayer(henkilo.gpsSpot); 
+			map.addLayer(henkilo.gpsSpot); // lisätään sijaintirinkula
 			self.gpsSpot.setLatLng(e.latlng); // siirretään GPS positiota
 			
 			$(".leaflet-control-track-interior").css("background-color", "lightblue" )
@@ -244,10 +293,12 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 			{
 				$("#noty").html($scope.uber);
 				self.addMerkki = false;
-				L.marker(e.latlng, { draggable:true, icon: iconi}).addTo(map);
-				//var x = new Merkki(e);
-				//alert(x.marker.getLatLng());
-				//x.marker.addTo(map);
+				
+				var x = new Merkki(e, map);
+				x.Add(null);
+				map.AddMerkki( x );
+
+				
 			}
 		};
 
@@ -257,120 +308,56 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 
 	}
 
-	function Merkki(e){
-
+	function Merkki(e, kartta){
+		console.log("Merkki: constructor");
 		var self = this;
+		var map = kartta;
 		var location = e.latlng;
-		alert(e.accuracy);
+		var iconi = L.MakiMarkers.icon({icon: "rocket", color: "#b0b", size: "m"});
+		var marker = L.marker(e.latlng, { draggable:true, icon: iconi})
+		.on('click', onMarkerClick)
+		.on('dragend', onDragEnd);
+
+		var tyyppi = "kohde";
+
 		
-		this.marker = L.marker(location, { draggable:true});
+		this.Add = function(tyyppi)
+		{
+			
+			var n = $('#noty').noty({text: 'Merkki lisätty sijaintiisi!', type:"success", timeout:"2000", dismissQueue:false});
+			marker.addTo(map);
+		};
+
+		this.Hide = function(){
+			map.removeLayer(marker);
+		};
+
+		this.Remove = function(){
+
+		}
 		
-		
+		function onMarkerClick(e)
+		{
+			$("#verho").fadeIn("slow");
+		}
+
+		function onDragEnd(e)
+		{
+			console.log("Merkki: onDragEnd - "+e.distance + " "+ screen.width);
+			// merkki poistetaan, mikäli sitä liikuttaa kerralla 200 pixeliä 
+			// tai 1/3 näytön leveydestä pieninäyttöisillä laitteilla ( esim lumia 520 se on 100px) 
+			if( e.distance > screen.width/3 || e.distance > 200 ) 
+			{
+				console.log("siirryttiin: "+e.distance);
+				
+				map.RemoveMerkki(self);
+			}
+
+		}
 	}
 	
 
-	/*
-		MakiMarkers, täällä, koska ulkoisessa filussa angular ei tunnista
-	*/
-
-		(function () {
-  "use strict";
-
-  L.MakiMarkers = {
-    // Available Maki Icons
-    icons: ["airfield","airport","alcohol-shop","america-football","art-gallery","bakery","bank","bar",
-      "baseball","basketball","beer","bicycle","building","bus","cafe","camera","campsite","car",
-      "cemetery","chemist","cinema","circle-stroked","circle","city","clothing-store","college",
-      "commercial","cricket","cross","dam","danger","disability","dog-park","embassy",
-      "emergency-telephone","entrance","farm","fast-food","ferry","fire-station","fuel","garden",
-      "golf","grocery","hairdresser","harbor","heart","heliport","hospital","industrial",
-      "land-use","laundry","library","lighthouse","lodging","logging","london-underground",
-      "marker-stroked","marker","minefield","mobilephone","monument","museum","music","oil-well",
-      "park2","park","parking-garage","parking","pharmacy","pitch","place-of-worship",
-      "playground","police","polling-place","post","prison","rail-above","rail-light",
-      "rail-metro","rail-underground","rail","religious-christian","religious-jewish",
-      "religious-muslim","restaurant","roadblock","rocket","school","scooter","shop","skiing",
-      "slaughterhouse","soccer","square-stroked","square","star-stroked","star","suitcase",
-      "swimming","telephone","tennis","theatre","toilets","town-hall","town","triangle-stroked",
-      "triangle","village","warehouse","waste-basket","water","wetland","zoo"
-    ],
-    defaultColor: "#0a0",
-    defaultIcon: "circle-stroked",
-    defaultSize: "m",
-    apiUrl: "https://api.tiles.mapbox.com/v3/marker/",
-    smallOptions: {
-      iconSize: [20, 50],
-      popupAnchor: [0,-20]
-    },
-    mediumOptions: {
-      iconSize: [30,70],
-      popupAnchor: [0,-30]
-    },
-    largeOptions: {
-      iconSize: [36,90],
-      popupAnchor: [0,-40]
-    }
-  };
-
-  L.MakiMarkers.Icon = L.Icon.extend({
-    options: {
-      //Maki icon: any from https://www.mapbox.com/maki/ (ref: L.MakiMarkers.icons)
-      icon: L.MakiMarkers.defaultIcon,
-      //Marker color: short or long form hex color code
-      color: L.MakiMarkers.defaultColor,
-      //Marker size: "s" (small), "m" (medium), or "l" (large)
-      size: L.MakiMarkers.defaultSize,
-      shadowAnchor: null,
-      shadowSize: null,
-      shadowUrl: null,
-      className: "maki-marker"
-    },
-
-    initialize: function(options) {
-      var pin;
-
-      options = L.setOptions(this, options);
-
-      switch (options.size) {
-        case "s":
-          L.extend(options, L.MakiMarkers.smallOptions);
-          break;
-        case "l":
-          L.extend(options, L.MakiMarkers.largeOptions);
-          break;
-        default:
-          options.size = "m";
-          L.extend(options, L.MakiMarkers.mediumOptions);
-          break;
-      }
-
-
-      pin = "pin-" + options.size;
-
-      if (options.icon !== null) {
-        pin += "-" + options.icon;
-      }
-
-      if (options.color !== null) {
-        if (options.color.charAt(0) === "#") {
-          options.color = options.color.substr(1);
-        }
-
-        pin += "+" + options.color;
-      }
-
-      options.iconUrl = "" + L.MakiMarkers.apiUrl + pin +  ".png";
-      options.iconRetinaUrl = L.MakiMarkers.apiUrl + pin + "@2x.png";
-    }
-  });
 	
-  L.MakiMarkers.icon = function(options) {
-   
-    	return new L.MakiMarkers.Icon(options);
-    	
-  };
-})();
-
 	$(document).ready(function(){
 		init();
 	});
