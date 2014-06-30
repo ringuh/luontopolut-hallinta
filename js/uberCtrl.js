@@ -104,6 +104,11 @@ appCtrl.controller('uberCtrl', ['$scope',
   };
 })();
 
+/**
+ * Leaflet.UserMarker v1.0
+ * 
+ * Author: Jonatan Heyman <http://heyman.info>
+ */
 
 (function(window) {
     var icon = L.divIcon({

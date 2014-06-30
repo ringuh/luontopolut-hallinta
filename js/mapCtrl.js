@@ -6,8 +6,8 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 	$scope.siirto = siirto.alue;
 	$scope.sivuVaihtoehdot = [];
 
-	var henkilo = new Henkilo();
-	var kartta = new Kartta(henkilo);
+	
+	var kartta = new Kartta();
 	
 	
 	var plus = 0;
@@ -18,9 +18,9 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 		
 		kartta.addLayer();
 		kartta.controllerit();
+		$scope.lkm = kartta.MerkitLkm();
+		
 
-		
-		
 	}
 
 	$scope.verhoHide = function(){
@@ -36,10 +36,12 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 
 	
 
-	function Kartta(henkilo)
+	function Kartta()
 	{
 		console.log( "Kartta constructor");
 		var self = this;
+		var henkilo = new Henkilo(self);
+		this.reitti = new Reitti(self);
 		this.tiilit = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 		this.southWest = L.latLng(60.0, 22.73);
     	this.northEast = L.latLng(62.48, 24.83);
@@ -75,16 +77,15 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 			console.log("Kartta: controllerit");
 			self.map.addControl( new L.Control.Track() );
 			self.map.addControl( new L.Control.Marker() );
-			//map.addControl( new L.Control.Reitti() );
-			//map.addControl( new L.Control.SaveReitti() );
-			//map.addControl( new L.Control.SaveMap() );
-			//map.addControl( new L.Control.DeleteReitti() );
+			self.map.addControl( new L.Control.Reitti() );
+			self.map.addControl( new L.Control.SaveReitti() );
+			self.map.addControl( new L.Control.SaveMap() );
+			self.map.addControl( new L.Control.DeleteReitti() );
 		};
 		
 		
 		this.addLayer = function(){
 			console.log("Kartta: addLayer");
-			henkilo.setKartta(this.map);
 			this.tileLayer.addTo(this.map);
 			
 			
@@ -118,7 +119,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 			console.log("Kartta:lisaaMerkki");
 			henkilo.addMerkki = true;
 			henkilo.setGps(true);
-			self.locate();
+
 		}
 		
 		function onZoomend(){
@@ -149,18 +150,30 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 		this.AddMerkki = function(e)
 		{
 			if( merkit.indexOf(e) == -1)
+			{
+				e.Add("null");
 				merkit.push(e);
+				$scope.lkm = self.MerkitLkm();
+				$scope.$digest();
+			}
 			else
 				alert("merkki oli jo");
 		};
 
 		this.RemoveMerkki = function(e)
 		{
+			console.log("Kartta:removeMerkki "+merkit.length);
 			for( var i in merkit )
 			{
 				if( merkit[i] == e )
 				{
-					merkit.splice(i, 1);					
+					console.log("poistettava löytyi "+i);
+					e.Hide();
+					e = null;
+
+					merkit.splice(i, 1);	
+					$scope.lkm = self.MerkitLkm();
+					$scope.$digest();				
 				}
 			}
 		};
@@ -181,27 +194,8 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 				L.DomEvent
 					.addListener(controlDiv, 'click', L.DomEvent.stopPropagation)
 					.addListener(controlDiv, 'click', L.DomEvent.preventDefault)
-				.addListener(controlDiv, 'click', function () { 
-					
-
-					if( henkilo.setGps() ) // tarkistetaan onko GPS käynnistetty
-					{
-						
-						self.locate(); // paikallistetaan
-						
-						
-					}
-					else
-					{	// gps oli poissa päältä
-						
-						self.map.stopLocate(); //lopetetaan sijainnin trackaus
-						self.map.removeLayer(henkilo.gpsSpot); // poistetaan sijaintirinkula
-						$(".leaflet-control-track-interior")
-							.css("background-color", "#FFFFFF" )
-							.css("border", "none");
-						// poistetaan efektit kontrollerista
-					}
-						
+				.addListener(controlDiv, 'click', function () { 					
+						henkilo.setGps();						
 				});
 
 				var controlUI = L.DomUtil.create('div', 'leaflet-control-track-interior', controlDiv);
@@ -225,9 +219,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 					.addListener(controlDiv, 'click', L.DomEvent.stopPropagation)
 					.addListener(controlDiv, 'click', L.DomEvent.preventDefault)
 				.addListener(controlDiv, 'click', function () { 
-					self.lisaaMerkki();
-					
-					
+					self.lisaaMerkki();					
 				});
 
 				var controlUI = L.DomUtil.create('div', 'leaflet-control-marker-interior', controlDiv);
@@ -240,19 +232,122 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 			return new L.Control.Marker(options);
 		};
 
+		L.Control.Reitti = L.Control.extend({
+			options: {
+				position: 'topright',
+			},
+
+			onAdd: function (map) {
+				var controlDiv = L.DomUtil.create('div', 'leaflet-control-reitti');
+				L.DomEvent
+					.addListener(controlDiv, 'click', L.DomEvent.stopPropagation)
+					.addListener(controlDiv, 'click', L.DomEvent.preventDefault)
+				.addListener(controlDiv, 'click', function () { 
+					self.reitti.ToggleTrack();
+					henkilo.setGps(true);
+					
+					if( self.reitti.GetTrack() )
+						$(".leaflet-control-reitti-interior").css("background-color", "lightblue" );
+					else
+						$(".leaflet-control-reitti-interior").css("background-color", "#FFFFFF" );
+					
+					});
+
+				var controlUI = L.DomUtil.create('div', 'leaflet-control-reitti-interior', controlDiv);
+				controlUI.title = 'Piirrä reitti';
+				return controlDiv;
+			}
+		});
+		L.control.Reitti = function (options) {
+		return new L.Control.Reitti(options);
+		};
+		
+		L.Control.DeleteReitti = L.Control.extend({
+			options: {
+				position: 'topright',
+			},
+
+			onAdd: function (map) {
+				var controlDiv = L.DomUtil.create('div', 'leaflet-control-deletereitti');
+				L.DomEvent
+					.addListener(controlDiv, 'click', L.DomEvent.stopPropagation)
+					.addListener(controlDiv, 'click', L.DomEvent.preventDefault)
+				.addListener(controlDiv, 'click', function () { 
+						//$scope.tyhjennaReitti();
+					});
+
+				var controlUI = L.DomUtil.create('div', 'leaflet-control-deletereitti-interior', controlDiv);
+				controlUI.title = 'Poista reitti';
+				return controlDiv;
+			}
+		});
+
+		L.control.DeleteReitti = function (options) {
+			return new L.Control.DeleteReitti(options);
+		};
+		
+		L.Control.SaveMap = L.Control.extend({
+			options: {
+				position: 'topleft',
+			},
+
+			onAdd: function (map) {
+				var controlDiv = L.DomUtil.create('div', 'leaflet-control-savemap');
+				L.DomEvent
+					.addListener(controlDiv, 'click', L.DomEvent.stopPropagation)
+					.addListener(controlDiv, 'click', L.DomEvent.preventDefault)
+				.addListener(controlDiv, 'click', function () { 
+						//$scope.tallennaMerkit();
+						
+					});
+
+				var controlUI = L.DomUtil.create('div', 'leaflet-control-savemap-interior', controlDiv);
+				controlUI.title = 'Tallenna merkit';
+				return controlDiv;
+			}
+		});
+
+		L.control.SaveMap = function (options) {
+			return new L.Control.SaveMap(options);
+		};
+		
+		L.Control.SaveReitti = L.Control.extend({
+			options: {
+				position: 'topright',
+			},
+
+			onAdd: function (map) {
+				var controlDiv = L.DomUtil.create('div', 'leaflet-control-savereitti');
+				L.DomEvent
+					.addListener(controlDiv, 'click', L.DomEvent.stopPropagation)
+					.addListener(controlDiv, 'click', L.DomEvent.preventDefault)
+				.addListener(controlDiv, 'click', function () { 
+						//$scope.tallennaReitti();
+					});
+
+				var controlUI = L.DomUtil.create('div', 'leaflet-control-savereitti-interior', controlDiv);
+				controlUI.title = 'Tallenna reitti';
+				return controlDiv;
+			}
+		});
+
+		L.control.SaveReitti = function (options) {
+			return new L.Control.SaveReitti(options);
+		};
 
 	} /// END OF KARTTA
 
-	function Henkilo()
+	function Henkilo(kartta)
 	{
 		var self = this;
-		var map;
+		
+		
 		var gps = false;
 		this.addMerkki = false;
 
 		var location = [61.497649,23.784156];
 		//this.gpsSpot =	L.circle(location, 2000);
-		this.gpsSpot = L.userMarker(location,{pulsing:true, accuracy:100, smallIcon:true});
+		var gpsSpot = L.userMarker(location,{pulsing:true, accuracy:100, smallIcon:true});
 
 
 		this.setGps = function(bool)
@@ -262,6 +357,22 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 				gps = true;
 			else
 				gps = !gps;
+
+			if( gps  ) // poistetaan sijaintirinkula tarvittaessa
+			{
+				kartta.locate(); // paikallistetaan
+			}
+			else
+			{
+				kartta.map.removeLayer(gpsSpot);
+				kartta.map.stopLocate(); //lopetetaan sijainnin trackaus
+						
+				$(".leaflet-control-track-interior")
+					.css("background-color", "#FFFFFF" )
+					.css("border", "none");
+						// poistetaan efektit kontrollerista
+			}
+			
 
 			console.log("Henkilo:return gps "+gps);
 			return gps;
@@ -273,21 +384,25 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 			return gps;
 		}
 
-		this.setKartta = function(m){
-			console.log("Henkilo:setKartta");
-			map = m;
-		}
+		this.hideSpot = function()
+		{
+			this.setGps();
+		};
+
 
 		this.setLocation = function(e)
 		{
-			self.gpsSpot.setAccuracy(e.accuracy);
-			
+			gpsSpot.setAccuracy(e.accuracy);
+
 			console.log("Henkilo:setLocation");
 			location = [ e.latlng.lat, e.latlng.lng ];
 			
-			map.removeLayer(henkilo.gpsSpot); 
-			map.addLayer(henkilo.gpsSpot); // lisätään sijaintirinkula
-			self.gpsSpot.setLatLng(e.latlng); // siirretään GPS positiota
+
+			console.log(kartta.map);
+			
+			kartta.map.removeLayer(gpsSpot); 
+			kartta.map.addLayer(gpsSpot); // lisätään sijaintirinkula
+			gpsSpot.setLatLng(e.latlng); // siirretään GPS positiota
 			
 			$(".leaflet-control-track-interior").css("background-color", "lightblue" )
 			.css("border", "2px solid black");
@@ -297,11 +412,12 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 				$("#noty").html($scope.uber);
 				self.addMerkki = false;
 				
-				var x = new Merkki(e, map);
-				x.Add(null);
-				map.AddMerkki( x );
-
+				kartta.AddMerkki( new Merkki(e, kartta) );
 				
+			}
+			if( kartta.reitti.GetTrack())
+			{
+				kartta.reitti.AddPiste(e);
 			}
 		};
 
@@ -314,14 +430,15 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 	function Merkki(e, kartta){
 		console.log("Merkki: constructor");
 		var self = this;
-		var map = kartta;
+		var map = kartta.map;
 		var location = e.latlng;
-		var iconi = L.MakiMarkers.icon({icon: "rocket", color: "#b0b", size: "m"});
+		var iconi = L.MakiMarkers.icon({icon: "rocket", color: "#b0b", size: "l"});
 		var marker = L.marker(e.latlng, { draggable:true, icon: iconi})
 		.on('click', onMarkerClick)
 		.on('dragend', onDragEnd);
 
 		var tyyppi = "kohde";
+		var halytysRaja = 10;
 
 		
 		this.Add = function(tyyppi)
@@ -335,9 +452,6 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 			map.removeLayer(marker);
 		};
 
-		this.Remove = function(){
-
-		}
 		
 		function onMarkerClick(e)
 		{
@@ -353,12 +467,54 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 			{
 				console.log("siirryttiin: "+e.distance);
 				
-				map.RemoveMerkki(self);
+				kartta.RemoveMerkki(self);
 			}
 
 		}
 	}
 	
+	function Reitti(kartta)
+	{
+		var lisaysRaja = 5; // raja, jota kauempaa saadut tulokset otetaan talteen
+		var pisteet = [];
+		var track = false;
+
+		this.ToggleTrack = function(){
+			track = !track;
+		};
+		this.GetTrack = function()
+		{
+			return track;
+		};
+		this.AddPiste = function(e)
+		{
+			if( pisteet.length > 0)
+			{
+				var dist = pisteet[pisteet.length-1].distanceTo(e.latlng, lisaysRaja);
+				if( dist > lisaysRaja ) // otetaan ylös 
+					pisteet.push( new Piste( e ));
+
+				alert(pisteet[0].distance);
+			}
+			
+			
+		};
+		
+	}
+
+	function Piste(e)
+	{
+		this.latlng = e.latlng;
+		this.distance = 0;
+		this.closest = 0;
+
+		this.distanceTo = function(x, raja){
+			var n = this.latlng.distanceTo(x);
+			if( n > raja )
+				this.distance = n;
+			return n;
+		};
+	}
 
 	
 	$(document).ready(function(){
