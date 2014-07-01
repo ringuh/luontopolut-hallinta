@@ -1,6 +1,8 @@
 appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, siirto, $http) {
  
 	$scope.siirto = siirto.alue;
+	$scope.sivuVaihtoehdot = [];
+	$scope.merkit = L.MakiMarkers.icons;
 	
 	var kartta = new Kartta();	
 	
@@ -80,6 +82,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 			console.log("Kartta: addLayer");
 			this.tileLayer.addTo(this.map);
 			this.reitti.Load();
+			this.haeSivut();
 			
 			
 		};
@@ -189,6 +192,20 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 			}
 		};
 
+		this.haeSivut = function(){
+			$http.post( siirto.rajapinta, { cmd: "getPages" })
+			.success( function(data){
+				console.log( "Sivuvaihtoehdot\n"+JSON.stringify(data) );
+				$scope.sivuVaihtoehdot = data;
+				var n = $('#noty').noty({text: 'Sivuvaihtoehdot haettu!', type:"success", timeout:"2000", dismissQueue:false});
+				
+			})
+			.error( function(){
+				
+				$('#noty').noty({text: 'Sivujen haku epäonnistui', type:"error", timeout:"2000", dismissQueue:false});
+				
+			});
+		};
 
 		/*
 		 	KONTROLLERIT, eli ZOOM yms ikonit kartassa.
@@ -475,12 +492,20 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 		this.clickable = true;
 		this.order = -1;
 		this.location = e.latlng;
+		this.nimi = "default";
+		this.sivuID = -1;
+		this.icon = "rocket";
+		this.size = "l";
+		this.color ="b0b";
+
+
 
 		
 		this.Add = function(tyyppi)
 		{
 			
-			var n = $('#noty').noty({text: 'Merkki lisätty sijaintiisi!', type:"success", timeout:"2000", dismissQueue:false});
+			var n = $('#noty').noty({text: 'Merkki lisätty sijaintiisi!', 
+				type:"success", timeout:"2000", dismissQueue:false});
 			marker.addTo(map);
 		};
 
@@ -491,7 +516,9 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 		
 		function onMarkerClick(e)
 		{
+			$scope.valittuMerkki = self;
 			$("#verho").fadeIn("slow");
+			$scope.$digest();
 		}
 
 		function onDragEnd(e)
@@ -683,6 +710,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 	
 	$(document).ready(function(){
 		init();
+		jscolor.install();
 	});
 
 

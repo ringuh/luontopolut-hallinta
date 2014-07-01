@@ -2,11 +2,21 @@
 		<div id="popup">
 			<p> moi oon verho</p>
 			<ul>
-				<li ng-repeat="sivu in sivuVaihtoehdot">{{sivu.id}}-{{sivu.tunniste}}
-					<input type="button" ng-click="selectForMarker(sivu)" ng-show="sivu.id != valittuSivu" value="Valitse" />
+				<li ng-repeat="sivu in sivuVaihtoehdot">{{sivu.id}}-{{sivu.nimi}}
+					
 				</li>
+
 			</ul>
-			<input type="button" value="Sulje" ng-click="verhoHide()" />
+			<select ng-model="merkinMalli" ng-change="kuva=merkinMalli" >
+				<option ng-repeat="sivu in merkit" value="{{sivu}}" ng-selected="sivu == valittuMerkki.icon">{{sivu}}
+					
+				</option>
+			</select>{{kuva}}
+			<img ng-init="koko = 'l'; kuva = 'rocket'; vari = 'b0b'; " src="https://api.tiles.mapbox.com/v3/marker/pin-{{koko}}-{{kuva}}+{{vari}}@2x.png"></img>
+
+			<input class="color" ng-model="vari" value="{{vari}}" />
+			<input type="button" style="font-size:28px" value="Sulje" ng-click="verhoHide()" />
+
 		</div>
 	</div>
 	<div id="noty"></div>{{siirto}}
