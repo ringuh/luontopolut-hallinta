@@ -15,7 +15,7 @@ appCtrl.controller('FrontCtrl', ['$scope', '$http', '$location', 'siirto', funct
 		})
 		.error( function()
 		{
-			alert("error");
+			$('#noty').noty({text: data, type:"paikkojen haku kusi", timeout:"2000", dismissQueue:false});
 		});
 	}
 
@@ -39,6 +39,7 @@ appCtrl.controller('FrontCtrl', ['$scope', '$http', '$location', 'siirto', funct
 	};
 
 	$scope.valitse = function(alue){
+		localStorage.setItem("valittuAlue", alue.id);
 		siirto.alue = alue.id;
 
 		$location.path("/map");

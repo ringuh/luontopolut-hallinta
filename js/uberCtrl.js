@@ -3,9 +3,7 @@
 appCtrl.controller('uberCtrl', ['$scope', 
 	function($scope){
 	
-		$scope.uber = "uuuber";
-
-		$("#noty").html("jou");
+		
 				(function () {
   "use strict";
 

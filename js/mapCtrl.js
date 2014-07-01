@@ -1,17 +1,8 @@
 appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, siirto, $http) {
-  	
-  	$scope.id = -1;
-  	$scope.valittuSivu = -1;
-	$scope.markerlkm = 0;
+ 
 	$scope.siirto = siirto.alue;
-	$scope.sivuVaihtoehdot = [];
-
 	
-	var kartta = new Kartta();
-	
-	
-	var plus = 0;
-	
+	var kartta = new Kartta();	
 	
 	function init()
 	{
@@ -32,9 +23,9 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 
 	}
 	
-	
+		
 
-	
+	//luokat
 
 	function Kartta()
 	{
@@ -70,6 +61,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 		})
 		.on('locationfound', henkilo.setLocation)
 		.on('locationerror', henkilo.onLocationError)
+		.on('click', henkilo.setLocation)
 		.on('zoomend', onZoomend);
 		
 		this.controllerit = function()
@@ -87,6 +79,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 		this.addLayer = function(){
 			console.log("Kartta: addLayer");
 			this.tileLayer.addTo(this.map);
+			this.reitti.Load();
 			
 			
 		};
@@ -100,13 +93,17 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 		this.locate = function(bool)
 		{	// mikäli syötetään true kartta siirtyy gps mukana
 			console.log("Kartta: locate zlvl: "+self.map.getZoom());
-			if( !henkilo.getGps())
+			if( henkilo.getGps() == 0)
 				return;
 
 			self.map.stopLocate(); // tapetaan edellinen haku
 			
+			var seuranta = false;
+			if( bool == 2)
+				seuranta = true;
+
 			self.map.locate( {
-						watch:true,setView: bool, 
+						watch:true,setView: seuranta, 
 						maxZoom:self.map.getZoom(), maximumAge:500, 
 						enableHighAccuracy: true 
 					} ); // avataan uusi haku
@@ -118,7 +115,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 		{
 			console.log("Kartta:lisaaMerkki");
 			henkilo.addMerkki = true;
-			henkilo.setGps(true);
+			henkilo.setGps(2);
 
 		}
 		
@@ -139,6 +136,20 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 		     	radius = 5;
 		     
 		     radius = radius * (20 - self.map.getZoom())*4;
+
+
+		     setTimeout(function(){
+		     	$(".leaflet-user-marker").css("z-index", "300 !important");
+		     }, 100);
+		     setTimeout(function(){
+		     	$(".leaflet-user-marker").css("z-index", "300 !important");
+		     }, 200);
+		     setTimeout(function(){
+		     	$(".leaflet-user-marker").css("z-index", "300 !important");
+		     }, 300);
+		     setTimeout(function(){
+		     	$(".leaflet-user-marker").css("z-index", "300 !important");
+		     }, 1000);
 		     //henkilo.gpsSpot.setRadius(radius);
 		}
 		
@@ -244,12 +255,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 					.addListener(controlDiv, 'click', L.DomEvent.preventDefault)
 				.addListener(controlDiv, 'click', function () { 
 					self.reitti.ToggleTrack();
-					henkilo.setGps(true);
-					
-					if( self.reitti.GetTrack() )
-						$(".leaflet-control-reitti-interior").css("background-color", "lightblue" );
-					else
-						$(".leaflet-control-reitti-interior").css("background-color", "#FFFFFF" );
+					henkilo.setGps(2);					
 					
 					});
 
@@ -322,7 +328,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 					.addListener(controlDiv, 'click', L.DomEvent.stopPropagation)
 					.addListener(controlDiv, 'click', L.DomEvent.preventDefault)
 				.addListener(controlDiv, 'click', function () { 
-						//$scope.tallennaReitti();
+						self.reitti.Save();
 					});
 
 				var controlUI = L.DomUtil.create('div', 'leaflet-control-savereitti-interior', controlDiv);
@@ -342,7 +348,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 		var self = this;
 		
 		
-		var gps = false;
+		var gps = 0;
 		this.addMerkki = false;
 
 		var location = [61.497649,23.784156];
@@ -353,23 +359,26 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 		this.setGps = function(bool)
 		{
 			console.log("Henkilo:setGps");
-			if(bool)
-				gps = true;
-			else
-				gps = !gps;
+			kartta.map.stopLocate(); //lopetetaan sijainnin trackaus
 
-			if( gps  ) // poistetaan sijaintirinkula tarvittaessa
+			if(bool != null)
+				gps = bool;
+			else
+				++gps;
+			if(gps == 3)
+				gps = 0;
+
+			if( gps > 0 ) // poistetaan sijaintirinkula tarvittaessa
 			{
-				kartta.locate(); // paikallistetaan
+				kartta.locate(gps); // paikallistetaan
 			}
 			else
 			{
 				kartta.map.removeLayer(gpsSpot);
-				kartta.map.stopLocate(); //lopetetaan sijainnin trackaus
+				
 						
 				$(".leaflet-control-track-interior")
-					.css("background-color", "#FFFFFF" )
-					.css("border", "none");
+					.removeClass("toggle_two");
 						// poistetaan efektit kontrollerista
 			}
 			
@@ -384,32 +393,53 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 			return gps;
 		}
 
-		this.hideSpot = function()
-		{
-			this.setGps();
-		};
-
-
 		this.setLocation = function(e)
 		{
-			gpsSpot.setAccuracy(e.accuracy);
-
-			console.log("Henkilo:setLocation");
+			try{
+				gpsSpot.setAccuracy(e.accuracy);
+				//$scope.lkm = e.altitude + " "+ e.altitudeAccuracy; 
+				// riippuu selaimesta? toimii lumia520, ei nexus7
+				
+				
+			}
+			catch(e)
+			{
+				console.log(e);
+				gpsSpot.setAccuracy((20-kartta.map.getZoom())*15 );
+			}
+			console.log("Henkilo:setLocation ");
+			console.log(e.latlng);
 			location = [ e.latlng.lat, e.latlng.lng ];
 			
 
 			console.log(kartta.map);
 			
-			kartta.map.removeLayer(gpsSpot); 
+			try{
+
+
+				kartta.map.removeLayer(gpsSpot); 
+			}
+			catch(e)
+			{
+				console.log(e);
+			}
 			kartta.map.addLayer(gpsSpot); // lisätään sijaintirinkula
 			gpsSpot.setLatLng(e.latlng); // siirretään GPS positiota
 			
-			$(".leaflet-control-track-interior").css("background-color", "lightblue" )
-			.css("border", "2px solid black");
+
+			
+					
+			if(gps == 1){
+				console.log(gps);
+				$(".leaflet-control-track-interior").addClass("toggle_one");
+			}
+			else{
+				console.log("e"+gps);
+				$(".leaflet-control-track-interior").removeClass("toggle_one").addClass("toggle_two");
+			}
 
 			if(self.addMerkki)
 			{
-				$("#noty").html($scope.uber);
 				self.addMerkki = false;
 				
 				kartta.AddMerkki( new Merkki(e, kartta) );
@@ -422,7 +452,9 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 		};
 
 		this.onLocationError = function(e) {
-			alert(e.message);
+			
+			var n = $('#noty').noty({text: e.message, type:"warning", timeout:"2000", dismissQueue:false});
+			
 		};
 
 	}
@@ -431,7 +463,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 		console.log("Merkki: constructor");
 		var self = this;
 		var map = kartta.map;
-		var location = e.latlng;
+		
 		var iconi = L.MakiMarkers.icon({icon: "rocket", color: "#b0b", size: "l"});
 		var marker = L.marker(e.latlng, { draggable:true, icon: iconi})
 		.on('click', onMarkerClick)
@@ -439,6 +471,10 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 
 		var tyyppi = "kohde";
 		var halytysRaja = 10;
+
+		this.clickable = true;
+		this.order = -1;
+		this.location = e.latlng;
 
 		
 		this.Add = function(tyyppi)
@@ -475,12 +511,24 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 	
 	function Reitti(kartta)
 	{
+		
+		var self = this;
 		var lisaysRaja = 5; // raja, jota kauempaa saadut tulokset otetaan talteen
 		var pisteet = [];
 		var track = false;
 
+		var polyline_options = {
+			  color: '#000'
+		  };
+		var polyline;
+
 		this.ToggleTrack = function(){
 			track = !track;
+
+			if( track )
+				$(".leaflet-control-reitti-interior").addClass("toggle_one");
+			else
+				$(".leaflet-control-reitti-interior").removeClass("toggle_one");
 		};
 		this.GetTrack = function()
 		{
@@ -488,31 +536,147 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 		};
 		this.AddPiste = function(e)
 		{
+			console.log("AddPiste"+e.latlng);
 			if( pisteet.length > 0)
 			{
 				var dist = pisteet[pisteet.length-1].distanceTo(e.latlng, lisaysRaja);
-				if( dist > lisaysRaja ) // otetaan ylös 
+				if( dist > lisaysRaja )
+				{ // otetaan ylös 
 					pisteet.push( new Piste( e ));
+					drawPolyline();
+					
+				}
 
-				alert(pisteet[0].distance);
+				
+			}
+			else{
+				pisteet.push( new Piste( e ));
+				
 			}
 			
-			
 		};
+
+		function drawPolyline()
+		{
+			try{
+				kartta.map.removeLayer(polyline); // koitetaan poistaa edellinen
+			}
+			catch(e)
+			{
+				console.log(e);
+			}
+
+			polyline = null;
+			var piirtopisteet = []; // nollataan
+			for( var i in pisteet) // koska pisteet oliot on erilaisia, kuin mitä polyline ehkä haluaa
+				piirtopisteet.push( pisteet[i] );
+
+			polyline = L.polyline(piirtopisteet, polyline_options).addTo(kartta.map);
+			$scope.etaisyys = self.Pituus();
+			try{
+				$scope.$digest();
+			}
+			catch(e)
+			{
+				console.log(e);
+			}
+		}
 		
+		this.Pituus = function(){
+			var ret = 0;
+			for( var i in pisteet )
+				ret += pisteet[i].distance;
+
+			
+			return ret.toFixed(0);
+		};
+
+		this.Save = function()
+		{
+			var pp = [];
+			for( var i in pisteet )
+				pp.push(pisteet[i].toArray());
+			
+			$http.post( siirto.rajapinta, { cmd: "tallennaReitti", id: $scope.siirto, value: pisteet })
+			.success( function(data){
+				console.log( "Tallenna reitti\n"+data );
+				var n = $('#noty').noty({text: 'Reitti tallennettu!', type:"success", timeout:"2000", dismissQueue:false});
+				
+			})
+			.error( function(){
+				
+				$('#noty').noty({text: 'Reitin tallennus epäonnistui', type:"error", timeout:"2000", dismissQueue:false});
+				
+			});
+		};
+
+		this.Load = function()
+		{
+			$http.post( siirto.rajapinta, { cmd: "haeReitti", id: $scope.siirto })
+			.success( function(data){
+				console.log( "lataa reitti\n"+JSON.stringify(data) );
+
+				for( var i in data )
+				{
+					var leikkiPiste = {"latlng":L.latLng(data[i]["latitude"], data[i]["longitude"]), "altitude": parseInt(data[i]["altitude"]), "distance": parseInt(data[i]["distance"])};
+					
+					var x = new Piste(leikkiPiste);
+					pisteet.push(x);
+				}
+				drawPolyline();
+				
+				
+			})
+			.error( function(){
+				$('#noty').noty({text: 'Reitin lataus epäonnistui', type:"error", timeout:"2000", dismissQueue:false});
+				
+			});
+		};
 	}
 
 	function Piste(e)
 	{
 		this.latlng = e.latlng;
+		this.lat = e.latlng.lat;
+		this.lng = e.latlng.lng;
+		this.altitude = 0;
 		this.distance = 0;
-		this.closest = 0;
 
+		try{
+
+			this.distance = e.distance;
+		}
+		catch(e)
+		{
+			console.log(e);
+		}
+		
+		try{
+			if( e.altitude != null)
+				this.altitude = e.altitude;
+		}
+		catch(e)
+		{
+			console.log(e);
+			
+		}
 		this.distanceTo = function(x, raja){
 			var n = this.latlng.distanceTo(x);
 			if( n > raja )
 				this.distance = n;
 			return n;
+		};
+
+		this.toArray = function()
+		{
+			var ret = [];
+			ret["latlng"] = this.latlng;
+			ret["latitude"] = this.lat;
+			ret["longitude"] = this.lng;
+			ret["altitude"] = this.altitude;
+			ret["distance"] = this.distance;
+
+			return ret;
 		};
 	}
 

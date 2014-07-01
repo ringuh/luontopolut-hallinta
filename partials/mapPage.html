@@ -1,8 +1,3 @@
-
-
-
-
-	
 	<div id="verho">
 		<div id="popup">
 			<p> moi oon verho</p>
@@ -14,16 +9,8 @@
 			<input type="button" value="Sulje" ng-click="verhoHide()" />
 		</div>
 	</div>
-	<div id="noty"></div>
-	<div id="etaisyys">{{lkm}} | etaisyys</div>
+	<div id="noty"></div>{{siirto}}
+	<div id="etaisyys" ng-init="lkm = 0;etaisyys = 0">{{lkm}} | {{etaisyys}} m</div>
 	<div id="map"></div>
 
-	
-	<!--<span id="marksCount"></span>"{{reittiPiirto}}"
-	<!--<input type="button" ng-click="track()" value="track me" />-->
-	<!--<input type="button" ng-click="reittiPiirto = !reittiPiirto" value="Piirrä reitti" />-->
-	<!--<input type="button" ng-click="tallennaReitti()" value="Tallenna reitti" />
-	<input type="button" ng-click="tyhjennaReitti()" value="Poista reitti kannasta" />
-	<!--<input type="button" ng-click="lisaaMerkki()" value="Lisää merkki omaan sijaintiisi" />-->
-	<!--<input type="button" ng-click="tallennaMerkit()" value="Tallenna kartta" />-->
 	

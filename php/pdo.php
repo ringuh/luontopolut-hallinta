@@ -131,21 +131,74 @@
 			}
 		}
 		
+		function SavePath($id, $value)
+		{
+
+			
+			$this->DeletePath($id);
+
+
+			$str = "INSERT INTO $this->reitti_ ( tlp_rata_id, latitude, longitude, altitude, distance ) values ";
+
+			for( $i = 0; $i < count($value); ++$i )
+			{
+				if( $i == 0)
+					$str .= "( :id$i, :lat$i, :lng$i, :alt$i, :dist$i )";
+				else
+					$str .= ",( :id$i, :lat$i, :lng$i, :alt$i, :dist$i )";
+			}
+
+			$sth = $this->db->prepare($str);
+			
+
+
+			for( $i = 0; $i < count($value); ++$i )
+			{
+				$sth->bindParam(":id$i", $id, PDO::PARAM_INT );
+				$sth->bindParam(":lat$i", $value[$i]["lat"], PDO::PARAM_STR );
+				$sth->bindParam(":lng$i", $value[$i]["lng"], PDO::PARAM_STR );
+				$sth->bindParam(":alt$i", $value[$i]["altitude"], PDO::PARAM_STR );
+				$sth->bindParam(":dist$i", $value[$i]["distance"], PDO::PARAM_STR );
+			}	
+			echo $str;
+			$sth->execute();
+			
+		}
+
+		function GetPath( $id )
+		{
+			if( $id == null)
+			{
+				$str = "select * from $this->reitti_";
+				$sth = $this->db->prepare($str);
+				$sth->execute();
+				echo json_encode( $sth->fetchAll(PDO::FETCH_CLASS) );	
+			}
+			else
+			{
+				$str = "select * from $this->reitti_ where tlp_rata_id = :id";
+				$sth = $this->db->prepare($str);
+				$sth->bindParam(":id", $id, PDO::PARAM_INT );
+				$sth->execute();
+				echo json_encode( $sth->fetchAll(PDO::FETCH_CLASS) );	
+			}
+		}
 		
 		function DeleteKohde( $id, $rataid )
 		{
+
 			$str = "";
 			if( $id == null ) // poistetaan KAIKKI rataIDn mukaan
 			{
 				$str = "delete from $this->kohde_ where tlp_rata_id = :nimi";
 				$sth = $this->db->prepare($str);
-				$sth->bindParam(':nimi', $rataid, PDO::PARAM_STR, 45);
+				$sth->bindParam(':nimi', $rataid, PDO::PARAM_INT);
 			}
 			else // poistetaan vain yksi yksittäinen merkki
 			{
 				$str = "delete from $this->kohde_ where id = :nimi";
 				$sth = $this->db->prepare($str);
-				$sth->bindParam(':nimi', $id, PDO::PARAM_STR, 45);
+				$sth->bindParam(':nimi', $id, PDO::PARAM_INT);
 			}
 			$sth->execute();
 			
@@ -155,24 +208,25 @@
 				echo "DeleteKohde - rowcount0<hr>";
 		}
 		
-		function DeleteReitti( $id )
+		function DeletePath( $id )
 		{
 			$str = "delete from $this->reitti_ where tlp_rata_id = :nimi";
 			$sth = $this->db->prepare($str);
-			$sth->bindParam(':nimi', $rataid, PDO::PARAM_STR, 45);
+			$sth->bindParam(':nimi', $id, PDO::PARAM_INT);
 			$sth->execute();
 			
+			echo  $sth->rowCount(). " ".$str . $id;
 			if( $sth->rowCount() > 0)
-				echo "success - removed reitti of $id";
+				return true;
 			else
-				echo "DeleteReitti - rowcount0<hr>";
+				return false;
 		}
 		
 		function DeleteTagit( $id )
 		{
 			$str = "delete from $this->tagi_ where tlp_rata_id = :nimi";
 			$sth = $this->db->prepare($str);
-			$sth->bindParam(':nimi', $rataid, PDO::PARAM_STR, 45);
+			$sth->bindParam(':nimi', $rataid, PDO::PARAM_INT);
 			$sth->execute();
 			
 			if( $sth->rowCount() > 0)
@@ -185,7 +239,7 @@
 		{
 			$str = "delete from $this->sivu_ where id = :nimi";
 			$sth = $this->db->prepare($str);
-			$sth->bindParam(':nimi', $id, PDO::PARAM_STR, 45);
+			$sth->bindParam(':nimi', $id, PDO::PARAM_INT);
 			$sth->execute();
 			
 			if( $sth->rowCount() > 0)

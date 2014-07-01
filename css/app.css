@@ -238,3 +238,15 @@ input[type=button]
 {
   fill:green;
 }
+
+.toggle_one
+{
+  background-color:lightblue !important;
+  border:2px solid black;
+}
+
+.toggle_two
+{
+  background-color:red !important;
+  border:2px solid black;
+}

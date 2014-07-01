@@ -38,6 +38,10 @@
 			$db->DeleteFile( $id, $value );
 		else if( $cmd == "poistaTiedosto" && isset( $id ) )
 			$db->DeleteFile( $id, null );
+		else if( $cmd == "tallennaReitti" && isset( $id ) && isset( $value ))
+			$db->SavePath($id, $value);
+		else if( $cmd == "haeReitti" )
+			$db->GetPath($id);
 			
 			
 			

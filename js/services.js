@@ -9,7 +9,7 @@ var appService = angular.module('myApp.services', []);
 appService.value('version', '0.1');
 
 appService.service('siirto', function(){
-	this.alue = 9;
+	this.alue = localStorage.getItem("valittuAlue");
 	this.php = "http://ohjryhma1.projects.tamk.fi/maps/v2/luontopolut-hallinta/php/";
 	this.rajapinta = this.php+"rajapinta.php";
 });
