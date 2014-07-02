@@ -293,11 +293,14 @@
 .leaflet-control-zoom-out {
 	font-size: 10vw;
 	font-weight:bold;
-
+	color:transparent !important;
+	background-image: url(../img/svg/zoomin.svg);
+	background-size:100% 100%;
 	}
 .leaflet-control-zoom-out {
 	font-size: 11vw;
 	font-weight:bold;
+	background-image: url(../img/svg/zoomout.svg);
 	}
 
 .leaflet-touch .leaflet-control-zoom-in {
@@ -529,7 +532,7 @@
 .leaflet-control-followtrack-interior,
 .leaflet-control-savemap-interior
 {
-    background-image: url(../img/gps-icon.png);
+    background-image: url(../img/svg/tikkataulu.svg);
     width: 10vw;
     height: 10vw;
     max-height:20vh;
@@ -564,7 +567,7 @@
 
 .leaflet-control-marker-interior
 {
-    background-image: url(../img/marker-icon.png);
+    background-image: url(../img/svg/marker.svg);
     /*width: 19px;
     height: 33px;*/
 }
@@ -583,7 +586,7 @@
 
 .leaflet-control-reitti-interior
 {
-    background-image: url(../img/reitti-icon.png);
+    background-image: url(../img/svg/lintu.svg);
     /*width: 25px;
     height: 23px;*/
     
@@ -592,7 +595,7 @@
 
 .leaflet-control-savereitti-interior
 {
-    background-image: url(../img/gnu.svg);
+    background-image: url(../img/svg/sdcard.svg);
     /*width: 25px;
     height: 26px;*/
     
@@ -600,7 +603,7 @@
 }
 .leaflet-control-deletereitti-interior
 {
-    background-image: url(../img/delete-icon.png);
+    background-image: url(../img/svg/kielto.svg);
     /*width: 24px;
     height: 23px;*/
     
@@ -609,7 +612,7 @@
 
 .leaflet-control-savemap-interior
 {
-    background-image: url(../img/save-icon.png);
+    background-image: url(../img/svg/disketti.svg);
     /*width: 25px;
     height: 26px;*/
     

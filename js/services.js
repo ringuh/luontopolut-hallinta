@@ -15,11 +15,13 @@ appService.service('siirto', function(){
 
 
 	this.colors = ["b0b", 
-					"0000FF", 
+					"4169E1", 
 					"008B8B", 
 					"DC143C", 
-					"6495ED", 
+					"00FFFF", 
 					"9ACD32", 
 					"FFFF00", 
-					"4682B4" ];
+					"A0522D",
+					"FFFAFA",
+					"FFA500" ];
 });

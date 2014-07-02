@@ -25,9 +25,10 @@
 				<input type="button" class="colorIcon" ng-class="{'toggle_one' : valittuMerkki.size == 's'}" ng-click="valittuMerkki.size = 's'" value="S"/>
 				<input type="button" class="colorIcon" ng-class="{'toggle_one' : valittuMerkki.size == 'm'}" ng-click="valittuMerkki.size = 'm'" value="M"/>
 				<input type="button" class="colorIcon" ng-class="{'toggle_one' : valittuMerkki.size == 'l'}" ng-click="valittuMerkki.size = 'l'" value="L"/>
-				
+				<div>
 				<label for="checkbox">Avattavissa:</label>
 				<input name="checkbox" type="checkBox" ng-init="valittuMerkki.clickable = 'false'" ng-model="valittuMerkki.clickable" />
+				</div>
 			
 			</div>
 
