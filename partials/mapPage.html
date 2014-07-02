@@ -1,33 +1,56 @@
 	<div id="verho">
-		<div id="popup">
-			<p> moi oon verho</p>
-			<ul>
-				<li ng-repeat="sivu in sivuVaihtoehdot">{{sivu.id}}-{{sivu.nimi}}
-					
-				</li>
-
-			</ul>
-			<select ng-model="merkinMalli" ng-change="kuva=merkinMalli" >
-				<option ng-repeat="sivu in merkit" value="{{sivu}}" ng-selected="sivu == valittuMerkki.icon">{{sivu}}
-					
+		<div id="popup" ng-init="valittuMerkki.icon = 'circle'; valittuMerkki.size = 'l'; valittuMerkki.color='b0b' ">
+		<div style="margin-bottom:20px;">
+			<input type="button" style="font-size:28px;" value="Sulje" ng-click="verhoHide();valittuMerkki.onSave()" /> <span style="font-size:18px;">Muutokset tallentuvat, mikäli painat tallennuskuvaketta</span> </div>
+			<div>
+			<div style="position:relative" ng-swipe-left="imgSwipeLeft()" ng-swipe-right="imgSwipeRight()" >
+			<h2> Säädä kuvake </h2>
+			<select ng-model="valittuMerkki.icon"  >
+				<option ng-repeat="sivu in merkit" value="{{sivu}}" ng-selected="sivu == valittuMerkki.icon">{{sivu}}					
 				</option>
-			</select>{{kuva}}
-			<img ng-init="koko = 'l'; kuva = 'rocket'; vari = 'b0b'; " src="https://api.tiles.mapbox.com/v3/marker/pin-{{koko}}-{{kuva}}+{{vari}}@2x.png"></img>
+			</select>
+			
+				<div style="float:right;margin-left:30px;width:20vw;min-width:60px;max-width:120px;">
+					<input type="button" class="colorIcon {{color}}" ng-init="internetExplorer(color)" ng-repeat="color in colors" ng-click="valittuMerkki.color = color;" style="color:#{{color}};background-color:#{{color}};background:#{{color}};"  ng-value="color">
+					</input>
+				</div>
+				<div style="margin:10vw;min-width:150px;" >
+					<img src="https://api.tiles.mapbox.com/v3/marker/pin-{{valittuMerkki.size}}-{{valittuMerkki.icon}}+{{valittuMerkki.color}}.png"></img>
+					<img src="https://api.tiles.mapbox.com/v3/marker/pin-{{valittuMerkki.size}}-{{valittuMerkki.icon}}+{{valittuMerkki.color}}@2x.png"></img>
+				</div>
+			</div>
 
-			<!--<input class="color" ng-model="vari" value="{{vari}}" />-->
-			<input type="button" style="width:auto;font-size:22px;" ng-class="{'toggle_one' : koko == 's'}" ng-click="koko = 's'" value="S"/>
-			<input type="button" style="width:auto;font-size:22px;" ng-class="{'toggle_one' : koko == 'm'}" ng-click="koko = 'm'" value="M"/>
-			<input type="button" style="width:auto;font-size:22px;" ng-class="{'toggle_one' : koko == 'l'}" ng-click="koko = 'l'" value="L"/>
+			
+			<div>
+				<input type="button" class="colorIcon" ng-class="{'toggle_one' : valittuMerkki.size == 's'}" ng-click="valittuMerkki.size = 's'" value="S"/>
+				<input type="button" class="colorIcon" ng-class="{'toggle_one' : valittuMerkki.size == 'm'}" ng-click="valittuMerkki.size = 'm'" value="M"/>
+				<input type="button" class="colorIcon" ng-class="{'toggle_one' : valittuMerkki.size == 'l'}" ng-click="valittuMerkki.size = 'l'" value="L"/>
+				
+				<label for="checkbox">Avattavissa:</label>
+				<input name="checkbox" type="checkBox" ng-init="valittuMerkki.clickable = 'false'" ng-model="valittuMerkki.clickable" />
+			
+			</div>
 
 
 			
-				<input type="button" ng-repeat="color in colors" ng-click="setVari(color)" style="color:#{{color}};background-color:#{{color}};width:40px">
-				</input>{{vari}}
+			</div>
+			<h3> Merkin nimi ja sivu, johon se linkkaa </h3>
+						<input type="text" ng-init="valittuMerkki.nimi = 'Oletustunniste'" ng-model="valittuMerkki.nimi" placeholder="Nimeä merkki. Esim Näsinneula" /> 
 			
 
 
+			<select style="margin-top:30px;" ng-model="valittuMerkki.sivuID">
+				<option value="-1" >Sivu puuttuu</option>
+				<option ng-repeat="sivu in sivuVaihtoehdot" value="{{sivu.id}}" >
+					{{sivu.nimi}}					
+				</option>
 
-			<input type="button" style="font-size:28px" value="Sulje" ng-click="verhoHide()" />
+			</select>
+			
+<!---->
+
+
+			
 
 		</div>
 	</div>

@@ -42,6 +42,11 @@
 			$db->SavePath($id, $value);
 		else if( $cmd == "haeReitti" )
 			$db->GetPath($id);
+		else if( $cmd == "tallennaMerkit" && isset( $id ) && isset( $value ))
+			$db->SaveTargets($id, $value);
+		else if( $cmd == "haeMerkit" )
+			$db->GetTargets($id);
+
 			
 			
 			

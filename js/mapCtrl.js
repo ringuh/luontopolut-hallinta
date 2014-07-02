@@ -25,15 +25,43 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 
 	}
 
-	$scope.setVari = function(c)
-	{
-		$scope.vari = c;
+	$scope.imgSwipeLeft = function(){
+		var i = $scope.merkit.indexOf($scope.valittuMerkki.icon)-1; 
+		var l = $scope.merkit.length - 1;
+
+		if( l < 0)
+			return;
+
+		if( i < 0)
+			i = l;
+
+		$scope.valittuMerkki.icon = $scope.merkit[i];
 	};
-	
-	$scope.$watch( 'vari', function(x,y){
-		alert(x +" "+ y);
-	});
+	$scope.imgSwipeRight = function(){
+		var i = $scope.merkit.indexOf($scope.valittuMerkki.icon)+1; 
+		var l = $scope.merkit.length - 1;
+
+		if( l < 0)
+			return;
+
+		if( i > l)
+			i = 0;
 		
+		$scope.valittuMerkki.icon = $scope.merkit[i];
+	};
+	$scope.$watch( 'vari', function(x,y){
+		//alert(x +" "+ y);
+	});
+	
+	$scope.internetExplorer = function(tt)
+	{
+		setTimeout(function(){
+			$("."+tt).css("background-color", "#"+tt).css("color", "#"+tt );
+		}, 1000);
+		
+		//return "{{background-color:#"+tt+"}}";
+
+	};	
 
 	//luokat
 
@@ -91,6 +119,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 			this.tileLayer.addTo(this.map);
 			this.reitti.Load();
 			this.haeSivut();
+			this.haeMerkit();
 			
 			
 		};
@@ -176,7 +205,13 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 				e.Add("null");
 				merkit.push(e);
 				$scope.lkm = self.MerkitLkm();
-				$scope.$digest();
+				try{
+					$scope.$digest();
+				}
+				catch(e)
+				{
+					console.log(e.message);
+				}
 			}
 			else
 				alert("merkki oli jo");
@@ -211,6 +246,41 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 			.error( function(){
 				
 				$('#noty').noty({text: 'Sivujen haku epäonnistui', type:"error", timeout:"2000", dismissQueue:false});
+				
+			});
+		};
+
+		this.saveMerkit = function(){
+			$http.post( siirto.rajapinta, { cmd: "tallennaMerkit", id: $scope.siirto, value: merkit })
+			.success( function(data){
+				console.log( "Tallenna Merkit\n"+JSON.stringify(data) );
+				
+				var n = $('#noty').noty({text: 'Kohteet tallennettu!', type:"success", timeout:"2000", dismissQueue:false});
+				
+			})
+			.error( function(){
+				
+				$('#noty').noty({text: 'Kohteiden tallennus epäonnistui', type:"error", timeout:"2000", dismissQueue:false});
+				
+			});
+		};
+
+		this.haeMerkit = function(){
+			$http.post( siirto.rajapinta, { cmd: "haeMerkit", id: $scope.siirto })
+			.success( function(data){
+				console.log( "Hae Merkit\n"+JSON.stringify(data) );
+				for( var i in data)
+				{
+					self.AddMerkki( new Merkki({"latlng":L.latLng(data[i]["latitude"], data[i]["longitude"])}, self, data[i] ));
+
+				}
+				
+				var n = $('#noty').noty({text: 'Kohteet haettu!', type:"success", timeout:"2000", dismissQueue:false});
+				
+			})
+			.error( function(){
+				
+				$('#noty').noty({text: 'Kohteiden haku epäonnistui', type:"error", timeout:"2000", dismissQueue:false});
 				
 			});
 		};
@@ -328,7 +398,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 					.addListener(controlDiv, 'click', L.DomEvent.stopPropagation)
 					.addListener(controlDiv, 'click', L.DomEvent.preventDefault)
 				.addListener(controlDiv, 'click', function () { 
-						//$scope.tallennaMerkit();
+						self.saveMerkit();
 						
 					});
 
@@ -484,28 +554,27 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 
 	}
 
-	function Merkki(e, kartta){
+	function Merkki(e, kartta, init){
 		console.log("Merkki: constructor");
 		var self = this;
 		var map = kartta.map;
 		
-		var iconi = L.MakiMarkers.icon({icon: "rocket", color: "#b0b", size: "l"});
-		var marker = L.marker(e.latlng, { draggable:true, icon: iconi})
-		.on('click', onMarkerClick)
-		.on('dragend', onDragEnd);
+		
 
 		
-		var halytysRaja = 10;
+		this.halytysraja = 10;
 
+		this.id = -1;
 		this.clickable = true;
-		this.order = -1;
+		
 		this.location = e.latlng;
-		this.nimi = "default";
+		this.nimi = "defaultNimi";
 		this.sivuID = -1;
-		this.icon = "rocket";
+		this.icon = "circle";
 		this.size = "l";
 		this.color ="b0b";
 
+		
 
 
 		
@@ -524,15 +593,24 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 		
 		function onMarkerClick(e)
 		{
+
 			$scope.valittuMerkki = self;
 			$scope.colors = siirto.colors;
+			$scope.kuva = self.icon;
 			$("#verho").fadeIn("slow");
 			$scope.$digest();
 		}
 
+		this.onSave = function()
+		{
+			marker.setIcon(L.MakiMarkers.icon({icon: self.icon, color: self.color, size: self.size}));
+			
+		};
+
 		function onDragEnd(e)
 		{
-			console.log("Merkki: onDragEnd - "+e.distance + " "+ screen.width);
+			console.log("Merkki: onDragEnd - "+e.distance + " "+ marker.getLatLng());
+			self.location = marker.getLatLng();
 			// merkki poistetaan, mikäli sitä liikuttaa kerralla 200 pixeliä 
 			// tai 1/3 näytön leveydestä pieninäyttöisillä laitteilla ( esim lumia 520 se on 100px) 
 			if( e.distance > screen.width/3 || e.distance > 200 ) 
@@ -545,6 +623,28 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 		}
 
 
+		if( init != null)
+		{
+			console.log( "jou\n" );
+			//{"id":"1","tlp_rata_id":"4","tlp_sivu_id":"-1","nimi":"defaultNimi","latitude":"61.4982","longitude":"23.7611","clickable":"0","halytysraja":"10","icon":"circle","color":"b0b","size":"l"},
+			this.id = init.id;
+			this.sivuID = init.tlp_sivu_id;
+			this.nimi = init.nimi;
+			if(init.clickable == "false")
+				this.clickable = false;
+			this.icon = init.icon;
+			this.color = init.color;
+			this.size = init.size;
+			this.halytysraja = init.halytysraja;
+
+
+			
+		}
+
+		var iconi = L.MakiMarkers.icon({icon: self.icon, color: self.color, size: self.size});
+		var marker = L.marker(e.latlng, { draggable:true, icon: iconi})
+		.on('click', onMarkerClick)
+		.on('dragend', onDragEnd);
 	}
 	
 	function Reitti(kartta)
@@ -721,7 +821,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 	
 	$(document).ready(function(){
 		init();
-		jscolor.install();
+		
 	});
 
 

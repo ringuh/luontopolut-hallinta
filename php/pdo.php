@@ -183,12 +183,129 @@
 				echo json_encode( $sth->fetchAll(PDO::FETCH_CLASS) );	
 			}
 		}
+
+		function SaveTargets($id, $value)
+		{
+			
+			$existing = array();
+			foreach( $value as $x ) // poistetaan ne tämän radan kohteet, joita ei ole enää olemassa
+				array_push($existing, $x["id"] );
+			
+			$this->DeleteKohde($existing, $id);
+			//echo json_encode($existing);
+
+
+			
+			foreach($value as $kohde)
+			{
+				$str = "";
+				$sth;
+				if( $kohde["id"] == -1)
+				{
+					$str = "INSERT INTO `tlp_kohde`"							
+							."(`tlp_rata_id`,"
+							."`tlp_sivu_id`,"
+							."`nimi`,"
+							."`latitude`,"
+							."`longitude`,"
+							."`clickable`,"
+							."`halytysraja`,"
+							."`icon`,"
+							."`color`,"
+							."`size`)"
+							."VALUES"
+							."("
+							.":rataID,"
+							.":sivuID,"
+							.":nimi,"
+							.":lat,"
+							.":lng,"
+							.":click,"
+							.":alarm,"
+							.":icon,"
+							.":color,"
+							.":size)";
+
+					
+					
+					
+					
+					$sth = $this->db->prepare($str);
+					
+				}
+				else
+				{
+					
+					$str = "UPDATE `tlp_kohde`"
+							."SET"
+							."`tlp_rata_id` = :rataID,"
+							."`tlp_sivu_id` = :sivuID,"
+							."`nimi` = :nimi,"
+							."`latitude` = :lat,"
+							."`longitude` = :lng,"
+							."`clickable` = :click,"
+							."`halytysraja` = :alarm,"
+							."`icon` = :icon,"
+							."`color` = :color,"
+							."`size` = :size "
+							."WHERE `id` = :id";
+
+					$sth = $this->db->prepare($str);
+					$sth->bindParam(":id", $kohde["id"], PDO::PARAM_INT );
+				}
+				
+
+				$sth->bindParam(":rataID", $id, PDO::PARAM_INT );
+				$sth->bindParam(":sivuID", $kohde["sivuID"], PDO::PARAM_INT );
+				$sth->bindParam(":nimi", $kohde["nimi"], PDO::PARAM_STR );
+				$sth->bindParam(":lat", $kohde["location"]["lat"], PDO::PARAM_STR );
+				$sth->bindParam(":lng", $kohde["location"]["lng"], PDO::PARAM_STR );
+				$sth->bindParam(":click", $kohde["clickable"], PDO::PARAM_STR );
+				$sth->bindParam(":alarm", $kohde["halytysraja"], PDO::PARAM_INT );
+				$sth->bindParam(":icon", $kohde["icon"], PDO::PARAM_STR );
+				$sth->bindParam(":color", $kohde["color"], PDO::PARAM_STR );
+				$sth->bindParam(":size", $kohde["size"], PDO::PARAM_STR );
+
+				
+				$sth->execute();
+				
+				echo $sth->rowCount();
+			}
+
+			
+			return;
+
+			
+			
+			
+		}
+
+		function GetTargets( $id )
+		{
+			
+			if( $id == null)
+			{
+				$str = "select * from $this->kohde_";
+				$sth = $this->db->prepare($str);
+				$sth->execute();
+				echo json_encode( $sth->fetchAll(PDO::FETCH_CLASS) );	
+			}
+			else
+			{
+				$str = "select * from $this->kohde_ where tlp_rata_id = :id";
+				$sth = $this->db->prepare($str);
+				$sth->bindParam(":id", $id, PDO::PARAM_INT );
+				$sth->execute();
+				echo json_encode( $sth->fetchAll(PDO::FETCH_CLASS) );	
+			}
+		}
+
 		
-		function DeleteKohde( $id, $rataid )
+		function DeleteKohde( $arr, $rataid )
 		{
 
 			$str = "";
-			if( $id == null ) // poistetaan KAIKKI rataIDn mukaan
+			if( $arr == null ) // poistetaan KAIKKI rataIDn mukaan
 			{
 				$str = "delete from $this->kohde_ where tlp_rata_id = :nimi";
 				$sth = $this->db->prepare($str);
@@ -196,9 +313,20 @@
 			}
 			else // poistetaan vain yksi yksittäinen merkki
 			{
-				$str = "delete from $this->kohde_ where id = :nimi";
+				$del = "( ";
+				for($i = 0; $i < count($arr); ++$i)
+				{
+					if( $i == 0)
+						$del .= $arr[$i];
+					else
+						$del .= ",".$arr[$i];
+				}
+				$del .= " )";
+
+
+				$str = "delete from $this->kohde_ where id NOT IN $del";
 				$sth = $this->db->prepare($str);
-				$sth->bindParam(':nimi', $id, PDO::PARAM_INT);
+				
 			}
 			$sth->execute();
 			
