@@ -14,7 +14,19 @@
 			</select>{{kuva}}
 			<img ng-init="koko = 'l'; kuva = 'rocket'; vari = 'b0b'; " src="https://api.tiles.mapbox.com/v3/marker/pin-{{koko}}-{{kuva}}+{{vari}}@2x.png"></img>
 
-			<input class="color" ng-model="vari" value="{{vari}}" />
+			<!--<input class="color" ng-model="vari" value="{{vari}}" />-->
+			<input type="button" style="width:auto;font-size:22px;" ng-class="{'toggle_one' : koko == 's'}" ng-click="koko = 's'" value="S"/>
+			<input type="button" style="width:auto;font-size:22px;" ng-class="{'toggle_one' : koko == 'm'}" ng-click="koko = 'm'" value="M"/>
+			<input type="button" style="width:auto;font-size:22px;" ng-class="{'toggle_one' : koko == 'l'}" ng-click="koko = 'l'" value="L"/>
+
+
+			
+				<input type="button" ng-repeat="color in colors" ng-click="setVari(color)" style="color:#{{color}};background-color:#{{color}};width:40px">
+				</input>{{vari}}
+			
+
+
+
 			<input type="button" style="font-size:28px" value="Sulje" ng-click="verhoHide()" />
 
 		</div>

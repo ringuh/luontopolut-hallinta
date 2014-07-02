@@ -24,7 +24,15 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 		$("#verho").fadeIn("slow");
 
 	}
+
+	$scope.setVari = function(c)
+	{
+		$scope.vari = c;
+	};
 	
+	$scope.$watch( 'vari', function(x,y){
+		alert(x +" "+ y);
+	});
 		
 
 	//luokat
@@ -486,7 +494,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 		.on('click', onMarkerClick)
 		.on('dragend', onDragEnd);
 
-		var tyyppi = "kohde";
+		
 		var halytysRaja = 10;
 
 		this.clickable = true;
@@ -517,6 +525,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 		function onMarkerClick(e)
 		{
 			$scope.valittuMerkki = self;
+			$scope.colors = siirto.colors;
 			$("#verho").fadeIn("slow");
 			$scope.$digest();
 		}
@@ -534,6 +543,8 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 			}
 
 		}
+
+
 	}
 	
 	function Reitti(kartta)
