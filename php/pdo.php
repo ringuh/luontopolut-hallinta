@@ -137,6 +137,8 @@
 			
 			$this->DeletePath($id);
 
+			if($value == null)
+				return;
 
 			$str = "INSERT INTO $this->reitti_ ( tlp_rata_id, latitude, longitude, altitude, distance ) values ";
 

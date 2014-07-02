@@ -374,7 +374,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 					.addListener(controlDiv, 'click', L.DomEvent.stopPropagation)
 					.addListener(controlDiv, 'click', L.DomEvent.preventDefault)
 				.addListener(controlDiv, 'click', function () { 
-						//$scope.tyhjennaReitti();
+						self.reitti.clear();
 					});
 
 				var controlUI = L.DomUtil.create('div', 'leaflet-control-deletereitti-interior', controlDiv);
@@ -697,6 +697,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 		function drawPolyline()
 		{
 			try{
+				
 				kartta.map.removeLayer(polyline); // koitetaan poistaa edellinen
 			}
 			catch(e)
@@ -769,6 +770,12 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 				$('#noty').noty({text: 'Reitin lataus epäonnistui', type:"error", timeout:"2000", dismissQueue:false});
 				
 			});
+		};
+
+		this.clear = function(){
+			
+			pisteet = [];
+			drawPolyline();
 		};
 	}
 
