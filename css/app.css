@@ -20,7 +20,8 @@ body
   background-color:Red;
   float:left;
   width:33.33%;
-  font-size:5vw;
+  font-size:7vh;
+  height:10vh;
   text-align:center;
 }
 
@@ -33,9 +34,9 @@ body
 
 #map
 {
-   height:85%;
+   height:90%;
    width:100%;
-   min-height:80vh;
+   min-height:82vh;
    min-width:80vw;
 }
 
@@ -47,13 +48,14 @@ body
   left:0px;
   width:100vw;
   min-height:100vh;
+  overflow-x:hidden;
   
   z-index:1001;
   background-color:silver;
   padding-bottom:50px;
 }
 
-#popup
+#popup,#reittiEdit
 {
   width:90vw;
   max-width:600px;
@@ -66,10 +68,7 @@ body
 	width:100vw;
 	max-width:100%;
 }
-.noty_message
-{
-	z-index:10020;
-}
+
 .noty_buttons 
 {
 	
@@ -177,7 +176,7 @@ input[type=button]
   margin:20px 0px;
   cursor:pointer;
 }
-#mkPage input, #mkPage textarea
+#mkPage input, #mkPage textarea, #verho textarea, #verho input
 {
   font-size:4vw;
   min-width:200px;
@@ -185,7 +184,7 @@ input[type=button]
   max-width:800px;
 }
 
-#mkPage textarea
+#mkPage textarea, #verho textarea
 {
   margin-top:10px;
   border:none;
@@ -193,7 +192,7 @@ input[type=button]
   height:40vh;
 }
 
-#mkPage input[type=submit]
+#mkPage input[type=submit], #reittiEdit input[type=submit]
 {
   border:2px solid black;
   width:100%;
@@ -257,12 +256,12 @@ input[type=button]
 
 .colorIcon
 {
-  min-width:30px;
-  min-height:30px;
+  min-width:30px !important;
+  min-height:30px !important;
   width:10vw !important;
   height:10vw !important;
-  max-width:60px;
-  max-height:60px;
+  max-width:60px !important;
+  max-height:60px !important;
   font-size:28px !important;
   text-align:center;
   padding:0px;
@@ -289,7 +288,12 @@ input[type=button]
 
 }
 
-#popup > h1,h2,h3,h4,h5,h6
+#verho > h1,h2,h3,h4,h5,h6
 {
   color:black !important;
+}
+
+#reittiEdit
+{
+  display:none;
 }

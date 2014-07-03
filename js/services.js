@@ -10,6 +10,7 @@ appService.value('version', '0.1');
 
 appService.service('siirto', function(){
 	this.alue = localStorage.getItem("valittuAlue");
+	this.alueNimi = localStorage.getItem("valittuAlueNimi");
 	this.php = "http://ohjryhma1.projects.tamk.fi/maps/v2/luontopolut-hallinta/php/";
 	this.rajapinta = this.php+"rajapinta.php";
 

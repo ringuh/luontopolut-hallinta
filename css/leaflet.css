@@ -279,6 +279,8 @@
 	padding:2px;
 	width: 10vw;
 	height: 10vw;
+	max-width:12vh;
+	max-height:12vh;
 	display:block;
 	
 
@@ -294,13 +296,13 @@
 	font-size: 10vw;
 	font-weight:bold;
 	color:transparent !important;
-	background-image: url(../img/svg/zoomin.svg);
+	background-image: url(../img/zoomin.png);
 	background-size:100% 100%;
 	}
 .leaflet-control-zoom-out {
 	font-size: 11vw;
 	font-weight:bold;
-	background-image: url(../img/svg/zoomout.svg);
+	background-image: url(../img/zoomout.png);
 	}
 
 .leaflet-touch .leaflet-control-zoom-in {
@@ -529,14 +531,15 @@
 .leaflet-control-marker-interior,
 .leaflet-control-deletereitti-interior,
 .leaflet-control-savereitti-interior,
+.leaflet-control-editreitti-interior,
 .leaflet-control-followtrack-interior,
 .leaflet-control-savemap-interior
 {
-    background-image: url(../img/svg/tikkataulu.svg);
+    background-image: url(../img/svg/doublecircle.svg);
     width: 10vw;
     height: 10vw;
-    max-height:20vh;
-    max-width:20vh;
+    max-height:12vh;
+    max-width:12vh;
     background-size:100% 100%;
     /*background-position: 50% 50%;*/
     background-repeat: no-repeat;
@@ -567,7 +570,7 @@
 
 .leaflet-control-marker-interior
 {
-    background-image: url(../img/svg/marker.svg);
+    background-image: url(../img/marker.png);
     /*width: 19px;
     height: 33px;*/
 }
@@ -586,7 +589,16 @@
 
 .leaflet-control-reitti-interior
 {
-    background-image: url(../img/svg/lintu.svg);
+    background-image: url(../img/trail.png);
+    /*width: 25px;
+    height: 23px;*/
+    
+
+}
+
+.leaflet-control-editreitti-interior
+{
+    background-image: url(../img/back.png);
     /*width: 25px;
     height: 23px;*/
     
@@ -595,7 +607,7 @@
 
 .leaflet-control-savereitti-interior
 {
-    background-image: url(../img/svg/sdcard.svg);
+    background-image: url(../img/save.png);
     /*width: 25px;
     height: 26px;*/
     
@@ -603,7 +615,7 @@
 }
 .leaflet-control-deletereitti-interior
 {
-    background-image: url(../img/svg/kielto.svg);
+    background-image: url(../img/fail.png);
     /*width: 24px;
     height: 23px;*/
     
@@ -612,7 +624,7 @@
 
 .leaflet-control-savemap-interior
 {
-    background-image: url(../img/svg/disketti.svg);
+    background-image: url(../img/tallenna.png);
     /*width: 25px;
     height: 26px;*/
     

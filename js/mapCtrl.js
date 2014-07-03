@@ -1,8 +1,11 @@
-appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, siirto, $http) {
+appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location', 
+	function($scope, siirto, $http, $location) {
  
 	$scope.siirto = siirto.alue;
+	$scope.reitinNimi = siirto.alueNimi;
 	$scope.sivuVaihtoehdot = [];
 	$scope.merkit = L.MakiMarkers.icons;
+
 	
 	var kartta = new Kartta();	
 	
@@ -61,6 +64,70 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 		
 		//return "{{background-color:#"+tt+"}}";
 
+	};
+
+
+
+	$scope.editTrail = function(){
+		$http.post( siirto.rajapinta, { cmd: "getRadat", id: $scope.siirto })
+			.success( function(data){ // haetaan lista kohteista
+				
+			console.log(JSON.stringify(data));
+			$scope.reitinNimi = data[0].nimi;
+			$scope.reitinOsoite = data[0].osoite;
+			$scope.reitinKuvaus = data[0].kuvaus;
+			$scope.reitinDesc = data[0].kuvaus_eng;
+		})
+		.error( function()
+		{
+			$('#noty').noty({text: data, type:"Paikan haku kusi", timeout:"2000", dismissQueue:false});
+		});
+
+		openVerho();
+		$("#popup").hide();
+		$("#reittiEdit").show();
+/*
+		$http.post( siirto.rajapinta, { cmd: "tallennaMerkit", id: $scope.siirto, value: merkit })
+			.success( function(data){
+				console.log( "Tallenna Merkit\n"+JSON.stringify(data) );
+				
+				var n = $('#noty').noty({text: 'Kohteet tallennettu!', type:"success", timeout:"2000", dismissQueue:false});
+				
+			})
+			.error( function(){
+				
+				$('#noty').noty({text: 'Kohteiden tallennus epäonnistui', type:"error", timeout:"2000", dismissQueue:false});
+				
+			});
+*/
+	};
+
+	$scope.editTrailPost = function()
+	{
+		$http.post( siirto.rajapinta, { cmd: "editRata", id: $scope.siirto, value: $scope.reitinNimi, 
+			osoite: $scope.reitinOsoite, desc: $scope.reitinKuvaus, desc_eng: $scope.reitinDesc })
+			.success( function(data){
+				console.log( "Tallenna Merkit\n"+JSON.stringify(data) );
+				
+				var n = $('#noty').noty({text: 'Reitti tallennettu!', type:"success", timeout:"2000", dismissQueue:false});
+				
+			})
+			.error( function(){
+				
+				$('#noty').noty({text: 'Reitin tallennus epäonnistui', type:"error", timeout:"2000", dismissQueue:false});
+				
+		});	
+		$("#reittiEdit").hide();
+		$scope.verhoHide();
+
+		if( $scope.reitinNimi == -1)
+		{
+			$location.path("/etusivu");
+			siirto.alue = -1;
+			siirto.alueNimi = -1;
+			localStorage.setItem("valittuAlue", siirto.alue);
+			localStorage.setItem("valittuAlueNimi", siirto.alueNimi);
+		}
 	};	
 
 	//luokat
@@ -111,6 +178,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 			self.map.addControl( new L.Control.SaveReitti() );
 			self.map.addControl( new L.Control.SaveMap() );
 			self.map.addControl( new L.Control.DeleteReitti() );
+			self.map.addControl( new L.Control.editReitti() );
 		};
 		
 		
@@ -386,6 +454,30 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 		L.control.DeleteReitti = function (options) {
 			return new L.Control.DeleteReitti(options);
 		};
+
+		L.Control.editReitti = L.Control.extend({
+			options: {
+				position: 'bottomright',
+			},
+
+			onAdd: function (map) {
+				var controlDiv = L.DomUtil.create('div', 'leaflet-control-editreitti');
+				L.DomEvent
+					.addListener(controlDiv, 'click', L.DomEvent.stopPropagation)
+					.addListener(controlDiv, 'click', L.DomEvent.preventDefault)
+				.addListener(controlDiv, 'click', function () { 
+						$scope.editTrail();
+					});
+
+				var controlUI = L.DomUtil.create('div', 'leaflet-control-editreitti-interior', controlDiv);
+				controlUI.title = 'Muokkaa reittiä';
+				return controlDiv;
+			}
+		});
+
+		L.control.EditReitti = function (options) {
+			return new L.Control.editReitti(options);
+		};
 		
 		L.Control.SaveMap = L.Control.extend({
 			options: {
@@ -582,7 +674,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', function($scope, sii
 		{
 			
 			var n = $('#noty').noty({text: 'Merkki lisätty sijaintiisi!', 
-				type:"success", timeout:"2000", dismissQueue:false});
+				type:"success", timeout:"1000", dismissQueue:true});
 			marker.addTo(map);
 		};
 

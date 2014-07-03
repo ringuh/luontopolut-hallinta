@@ -40,7 +40,9 @@ appCtrl.controller('FrontCtrl', ['$scope', '$http', '$location', 'siirto', funct
 
 	$scope.valitse = function(alue){
 		localStorage.setItem("valittuAlue", alue.id);
+		localStorage.setItem("valittuAlueNimi", alue.nimi);
 		siirto.alue = alue.id;
+		siirto.alueNimi = alue.nimi;
 
 		$location.path("/map");
 	};

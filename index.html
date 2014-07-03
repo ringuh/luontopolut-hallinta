@@ -15,12 +15,12 @@
 <body ng-controller="uberCtrl">
 
   <div class="navimenu" ng-controller="naviCtrl">
-    <div ng-click="goTo('/etusivu')">Etusivu</div>
+    <div ng-click="goTo('/etusivu')">Reitit</div>
     <div ng-click="goTo('/map')">Kartta</div>
-    <div ng-click="goTo('/newPage')">Uusi sivu</div>
+    <div ng-click="goTo('/newPage')">Sivu</div>
   </div>
 
-  <div id="noty"></div>
+  <div id="noty" style="position:absolute;"></div>
 
 
   <div ng-view></div>

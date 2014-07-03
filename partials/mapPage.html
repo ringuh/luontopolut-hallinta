@@ -3,7 +3,7 @@
 		<div style="margin-bottom:20px;">
 			<input type="button" style="font-size:28px;" value="Sulje" ng-click="verhoHide();valittuMerkki.onSave()" /> <span style="font-size:18px;">Muutokset tallentuvat, mikäli painat tallennuskuvaketta</span> </div>
 			<div>
-			<div style="position:relative" ng-swipe-left="imgSwipeLeft()" ng-swipe-right="imgSwipeRight()" >
+			<div style="position:relative"  ng-swipe-left="imgSwipeLeft()" ng-swipe-right="imgSwipeRight()" >
 			<h2> Säädä kuvake </h2>
 			<select ng-model="valittuMerkki.icon"  >
 				<option ng-repeat="sivu in merkit" value="{{sivu}}" ng-selected="sivu == valittuMerkki.icon">{{sivu}}					
@@ -35,12 +35,12 @@
 
 			
 			</div>
-			<h3> Merkin nimi ja sivu, johon se linkkaa </h3>
-						<input type="text" ng-init="valittuMerkki.nimi = 'Oletustunniste'" ng-model="valittuMerkki.nimi" placeholder="Nimeä merkki. Esim Näsinneula" /> 
+			<h3> Merkin tunniste ja sivu, johon se linkkaa </h3>
+						<label for="tunniste">Tunniste:</label><br/><input nimi="tunniste" type="text" ng-init="valittuMerkki.nimi = 'Oletustunniste'" ng-model="valittuMerkki.nimi" placeholder="Nimeä merkki. Esim Näsinneula" /> <br/>
 			
 
-
-			<select style="margin-top:30px;" ng-model="valittuMerkki.sivuID">
+			<label for="sivusto">Avattava sivu:</label><br/>
+			<select "sivusto"  ng-model="valittuMerkki.sivuID">
 				<option value="-1" >Sivu puuttuu</option>
 				<option ng-repeat="sivu in sivuVaihtoehdot" value="{{sivu.id}}" >
 					{{sivu.nimi}}					
@@ -53,10 +53,37 @@
 
 			
 
-		</div>
-	</div>
-	<div id="noty"></div>{{siirto}}
-	<div id="etaisyys" ng-init="lkm = 0;etaisyys = 0">{{lkm}} | {{etaisyys}} m</div>
-	<div id="map"></div>
+		</div><!-- end of popup -->
 
+
+
+
+
+
+		<div id="reittiEdit" >
+			<form ng-submit="editTrailPost()">
+				<input type="text" ng-model="reitinNimi" placeholder="Tästä kentästä voi muokata reitin nimeä" /><br/>
+				<input type="text" ng-model="reitinOsoite" placeholder="Lähtöpaikan osoite" /> <br/>
+				Reitin kuvaus suomeksi:<br/>
+				<textarea ng-init="reitinKuvaus = ''" ng-model="reitinKuvaus" placeholder="Radan kuvaus suomeksi">{{reitinKuvaus}}</textarea><br/>
+				Reitin kuvaus englanniksi:<br/>
+				<textarea ng-init="reitinDesc = ''" ng-model="reitinDesc" placeholder="Trail description på engelska">{{reitinDesc}}</textarea><br/>
+
+
+
+				<input type="submit" value="Tallenna" />
+			</form>
+
+			<p> poista koko rata kirjoittamalla nimeksi '-1' ja tallentamalla </p>
+		</div><!-- end of reittiedit -->
+	</div>
+	<div style="font-size:5vh;width:100%;">
+		<div style="float:left;overflow-x:hide">
+		
+		{{reitinNimi}} </div>
+		<div id="etaisyys" style="float:right;" ng-init="lkm = 0;etaisyys = 0">POI: {{lkm}} | {{etaisyys}}m </div>
+		<!--<input type="button" style="height:auto;width:auto;font-size:inherit;margin-top:10px;" ng-click="editTrail()" value="Muokkaa" />-->
+	</div>
+	<div id="map"></div>
+	
 	

@@ -20,10 +20,10 @@
 		if( $cmd == "addRata" && isset($id)) // lisää radan
 			$db->AddRata($id);
 		// editoidaan rataa. nimeä ja osoitetta. 
-		else if( $cmd == "editRata" && isset($id) && isset(	$value ) && isset( $_REQUEST['osoite'] ) )
-			$db->EditRata($id, $value, $_REQUEST['osoite'] );
+		else if( $cmd == "editRata" && isset($id) && isset(	$value )  )
+			$db->EditRata($id, $value, $_REQUEST['osoite'], $_REQUEST["desc"], $_REQUEST["desc_eng"] );
 		else if( $cmd == "getRadat" ) // haetaan kaikki radat
-			$db->GetRadat();
+			$db->GetRadat($id);
 		else if( $cmd == "getPages" ) // haetaan kaikki sivut
 			$db->GetSivut();
 		else if( $cmd == "removePage" && isset($id) ) // poistetaan sivu
@@ -54,7 +54,7 @@
 			
 			
 		else
-			echo "else $cmd";
+			echo "else ".json_encode($_REQUEST);
 
 	
 	

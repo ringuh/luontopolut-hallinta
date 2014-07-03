@@ -39,7 +39,7 @@
 				echo "success - added $place";
 		}
 		
-		function EditRata( $id, $value, $osoite)
+		function EditRata( $id, $value, $osoite, $desc, $desc_eng)
 		{
 			if( $value == -1 ) // jos value -1 poistetaan annettu $id
 			{	// muista poistaa KAIKKI viittaukset
@@ -53,26 +53,52 @@
 			*/
 				// poistetaan rataan liittyvät viitteet
 				$this->DeleteKohde( null, $id );
-				$this->DeleteReitti( $id );
+				$this->DeletePath( $id );
 				$this->DeleteTagit( $id );
+				$this->DeleteRata( $id );
 				
-				$str = "delete from $this->rata_ where nimi = :nimi"; // poistetaan rata
+				
+			}
+			else
+			{
+				$str = "UPDATE `tlp_rata` "
+						."SET "
+						."`nimi` = :nimi,"
+						."`osoite` = :osoite,"
+						."`kuvaus` = :kuvaus,"
+						."`kuvaus_eng` = :desc "
+						."WHERE `id` = :id";
+
 				$sth = $this->db->prepare($str);
-				$sth->bindParam(':nimi', $id, PDO::PARAM_STR, 45);
+				$sth->bindParam(":id", $id, PDO::PARAM_INT);
+				$sth->bindParam(":nimi", $value, PDO::PARAM_STR);
+				$sth->bindParam(":osoite", $osoite, PDO::PARAM_STR);
+				$sth->bindParam(":kuvaus", $desc, PDO::PARAM_STR);
+				$sth->bindParam(":desc", $desc_eng, PDO::PARAM_STR);
+				echo $str;
+				echo "xxxx: $id, $value, $osoite, $desc, $desc_eng |||";
 				$sth->execute();
-				
-				if( $sth->rowCount() > 0)
-					echo "success - removed rata of $id";
-				else
-					echo "Delete Rata - rowcount0<hr>";
+
+				echo "edit success";
 			}
 		}
 		
-		function GetRadat() // haetaan lista radoista
+		function GetRadat($id) // haetaan lista radoista
 		{
+			$str = "";
+			if( $id == null)
+			{
+				$str = "select * from $this->rata_";
+				$sth = $this->db->prepare($str);
+			}
+			else
+			{
+				$str = "select * from $this->rata_ WHERE id = :id";
+				$sth = $this->db->prepare($str);
+				$sth->bindParam(":id", $id, PDO::PARAM_INT);
+			}
+
 			
-			$str = "select * from $this->rata_";
-			$sth = $this->db->prepare($str);
 			$sth->execute();
 			echo json_encode( $sth->fetchAll(PDO::FETCH_CLASS) );			
 		}
@@ -374,6 +400,19 @@
 			
 			if( $sth->rowCount() > 0)
 				echo "success - removed sivu of $id";
+			else
+				echo "DeleteSivut - rowcount0<hr>";
+		}
+
+		function DeleteRata( $id )
+		{
+			$str = "delete from $this->rata_ where id = :nimi";
+			$sth = $this->db->prepare($str);
+			$sth->bindParam(':nimi', $id, PDO::PARAM_INT);
+			$sth->execute();
+			
+			if( $sth->rowCount() > 0)
+				echo "success - removed rata of $id";
 			else
 				echo "DeleteSivut - rowcount0<hr>";
 		}
