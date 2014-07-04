@@ -78,12 +78,13 @@
 				$ret["tagit"][$id] = $sth->fetchAll(PDO::FETCH_CLASS);
 				
 				
-				// SIVUT
-				$str = "select * from $this->sivu_";
-				$sth = $this->db->prepare($str);
-				$sth->execute();
-				$ret["sivut"][$id] = $sth->fetchAll(PDO::FETCH_CLASS);
+				
 			}
+			// SIVUT
+			$str = "select * from $this->sivu_";
+			$sth = $this->db->prepare($str);
+			$sth->execute();
+			$ret["sivut"] = $sth->fetchAll(PDO::FETCH_CLASS);
 			
 			echo json_encode($ret);
 		}
@@ -405,9 +406,9 @@
 			$str = "";
 			if( $arr == null ) // poistetaan KAIKKI rataIDn mukaan
 			{
-				$str = "delete from $this->kohde_ where tlp_rata_id = :nimi";
+				$str = "delete from $this->kohde_ where tlp_rata_id = :id";
 				$sth = $this->db->prepare($str);
-				$sth->bindParam(':nimi', $rataid, PDO::PARAM_INT);
+				$sth->bindParam(':id', $rataid, PDO::PARAM_INT);
 			}
 			else // poistetaan vain yksi yksittäinen merkki
 			{
@@ -422,8 +423,9 @@
 				$del .= " )";
 
 
-				$str = "delete from $this->kohde_ where id NOT IN $del";
+				$str = "delete from $this->kohde_ where tlp_rata_id = :id AND id NOT IN $del";
 				$sth = $this->db->prepare($str);
+				$sth->bindParam(':id', $rataid, PDO::PARAM_INT);
 				
 			}
 			$sth->execute();
