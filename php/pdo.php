@@ -18,6 +18,75 @@
 			$this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 			
 		}
+		function Julkaistu()
+		{
+			$in = "(";
+				for( $i = 0; $i < count($_REQUEST['julkaistut']); ++$i )
+				{
+					if( $i == 0 )
+						$in .= $_REQUEST['julkaisut'];
+					else
+						$in .= ','.$_REQUEST['julkaisut'];
+				}
+			$in .= ')';
+			
+			return $in;
+		}
+		
+		function GetClient()
+		{
+			$ret = array();	// haetaan kaikki julkaisuvalmiit radat
+			$str = "select * from $this->rata_";
+			$sth = $this->db->prepare($str);
+			$sth->execute();
+			$tmp = $sth->fetchAll(PDO::FETCH_COLUMN);
+			$sth->execute();
+			$ret["radat"] = $sth->fetchAll(PDO::FETCH_CLASS);
+			$ret["merkit"] = array();
+			$ret["reitit"] = array();
+			$ret["tagit"] = array();
+			$ret["sivut"] = array();
+			
+			//echo json_encode( $tmp );
+			
+			
+			foreach( $tmp as $rata )
+			{
+				
+				$id = $rata["id"];
+				
+				// merkit
+				$str = "select * from $this->kohde_ where tlp_rata_id = :id";
+				$sth = $this->db->prepare($str);
+				$sth->bindParam(":id", $id, PDO::PARAM_INT );
+				$sth->execute();
+				$ret["merkit"][$id] = $sth->fetchAll(PDO::FETCH_CLASS);	
+				
+				
+				// reitit
+				$str = "select * from $this->reitti_ where tlp_rata_id = :id";
+				$sth = $this->db->prepare($str);
+				$sth->bindParam(":id", $id, PDO::PARAM_INT );
+				$sth->execute();
+				$ret["reitit"][$id] = $sth->fetchAll(PDO::FETCH_CLASS);	
+				
+				// TAGIT
+				$str = "select * from $this->tagi_ WHERE tlp_rata_id = :id";
+				$sth = $this->db->prepare($str);
+				$sth->bindParam(":id", $id, PDO::PARAM_INT );
+				$sth->execute();
+				$ret["tagit"][$id] = $sth->fetchAll(PDO::FETCH_CLASS);
+				
+				
+				// SIVUT
+				$str = "select * from $this->sivu_";
+				$sth = $this->db->prepare($str);
+				$sth->execute();
+				$ret["sivut"][$id] = $sth->fetchAll(PDO::FETCH_CLASS);
+			}
+			
+			echo json_encode($ret);
+		}
 		
 		function AddRata( $id )
 		{
@@ -86,11 +155,12 @@
 		function GetRadat($id) // haetaan lista radoista
 		{
 			$str = "";
-			if( $id == null)
+			if( $id == null) // haetaan KAIKKI radat for hallinta
 			{
 				$str = "select * from $this->rata_";
 				$sth = $this->db->prepare($str);
 			}
+			
 			else
 			{
 				$str = "select * from $this->rata_ WHERE id = :id";

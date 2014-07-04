@@ -46,6 +46,9 @@
 			$db->SaveTargets($id, $value);
 		else if( $cmd == "haeMerkit" )
 			$db->GetTargets($id);
+		else if( $cmd == "haeClient" )
+			$db->GetClient();
+	
 
 			
 			
