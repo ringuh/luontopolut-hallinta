@@ -170,8 +170,8 @@ appCtrl.controller('mkPageCtrl', ['$scope', 'siirto', '$http', '$location', func
  	$scope.liitaKoodiin = function(file)
  	{
  		console.log(file);
- 		$scope.tekstiKentta += "\n<img src='"+file+"' />";
- 		$scope.textArea += "\n<img src='"+file+"' />";
+ 		$scope.tekstiKentta += "\n<img src='::url::"+file+"' />";
+ 		$scope.textArea += "\n<img src='::url::"+file+"' />";
  	};
 
 }]);
