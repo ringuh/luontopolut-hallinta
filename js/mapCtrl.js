@@ -760,6 +760,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 				var dist = pisteet[pisteet.length-1].distanceTo(e.latlng, lisaysRaja);
 				if( dist > lisaysRaja && dist < 5000 )
 				{ // otetaan ylös 
+					pisteet[pisteet.length-1].distance = dist;
 					pisteet.push( new Piste( e, kartta ));
 					self.drawPolyline();
 					
@@ -787,11 +788,9 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 			}
 
 			polyline = null;
-			var piirtopisteet = []; // nollataan
-			for( var i in pisteet) // koska pisteet oliot on erilaisia, kuin mitä polyline ehkä haluaa
-				piirtopisteet.push( pisteet[i] );
+			
 
-			polyline = L.polyline(piirtopisteet, polyline_options).addTo(kartta.map);
+			polyline = L.polyline(pisteet, polyline_options).addTo(kartta.map);
 			$scope.etaisyys = self.Pituus();
 			kartta.map.addLayer(self.clusters);
 			try{
@@ -805,8 +804,17 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 		
 		this.Pituus = function(){
 			var ret = 0;
+			var end = pisteet.length-1;
 			for( var i in pisteet )
-				ret += pisteet[i].distance;
+			{
+				var prev = i - 1;
+				if( i > 0 )
+				{
+					pisteet[prev].distance = pisteet[i].distanceTo(pisteet[prev], -1);
+					ret += parseInt(pisteet[prev].distance);
+				}
+				
+			}
 
 			
 			return ret.toFixed(0);
@@ -879,10 +887,11 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 			}
 		};
 
+
 		
 	}
 
-	function Piste(e, kartta)
+	function Piste(e, kartta, dist)
 	{
 		var self = this;
 		this.latlng = e.latlng;
@@ -896,15 +905,8 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 					.on('dragend', onDragEnd)
 					.addTo(kartta.reitti.clusters);
 
-		try{
-
-			this.distance = e.distance;
-		}
-		catch(e)
-		{
-			console.log(e);
-		}
-		
+		if( e.distance != null )
+			this.distance = parseInt(e.distance);
 		try{
 			if( e.altitude != null)
 				this.altitude = e.altitude;
@@ -963,8 +965,10 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 			}
 			else
 			{
-				console.log("else");
+				
 				kartta.reitti.drawPolyline();
+
+				
 			}
 
 			
