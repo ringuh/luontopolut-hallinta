@@ -254,6 +254,13 @@ input[type=button]
   border:2px solid black;
 }
 
+.toggle_border
+{
+  
+  border:2px solid black;
+}
+
+
 .colorIcon
 {
   min-width:30px !important;

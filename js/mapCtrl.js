@@ -197,7 +197,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 			
 			var seuranta = false;
 			var zoom = 17;
-			if( bool == 2)
+			if( bool == 1)
 			{
 				//$('#noty').noty({text: seuranta + " " + zoom, type:"error", timeout:"2000", dismissQueue:false});
 				
@@ -218,7 +218,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 		{
 			console.log("Kartta:lisaaMerkki");
 			henkilo.addMerkki = true;
-			henkilo.setGps(2);
+			henkilo.setGps(1);
 
 		}
 		
@@ -231,9 +231,11 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 	    }
 	    function moveEnd(){
 	     	function doit(){
-	     		console.log("doit");
-	     		 $(".leaflet-clickable.maki-marker-icon").css("z-index", "900");
-	     		 $(".leaflet-zoom-animated").css("z-index", "5");
+	     		
+	     		$(".leaflet-clickable.maki-marker-icon").css("z-index", "100");
+	     		$(".leaflet-zoom-animated").css("z-index", "0");
+	     		$(".leaflet-usermarker-small").css("z-index", "120 !important");
+	     		$(".leaflet-usermarker-large").css("z-index", "120 !important");
 	     	}
 	     	
 		     setTimeout(doit, 300);
@@ -398,7 +400,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 					.addListener(controlDiv, 'click', L.DomEvent.preventDefault)
 				.addListener(controlDiv, 'click', function () { 
 					self.reitti.ToggleTrack();
-					henkilo.setGps(2);					
+					henkilo.setGps(1);					
 					
 					});
 
@@ -545,7 +547,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 				
 						
 				$(".leaflet-control-track-interior")
-					.removeClass("toggle_two");
+					.removeClass("toggle_border");
 						// poistetaan efektit kontrollerista
 			}
 			
@@ -567,9 +569,13 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 				
 				gpsSpot.setLatLng(e.latlng);
 				
-				if( e. accuracy != null && gps != 0)
+				if( e.accuracy != null && gps != 0 )
 					gpsSpot.setAccuracy(e.accuracy);
+				else
+					gpsSpot.setAccuracy(10);
 				
+				if( e.accuracy > 200 )
+					gpsSpot.setAccuracy(200);
 			}
 			catch(e)
 			{
@@ -578,32 +584,14 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 			console.log("Henkilo:setLocation ");
 			console.log(e.latlng);
 			location = [ e.latlng.lat, e.latlng.lng ];
-			
-
-			console.log(kartta.map);
-			
-			try{
-
-
-				kartta.map.removeLayer(gpsSpot); 
-			}
-			catch(e)
-			{
-				console.log(e);
-			}
-			kartta.map.addLayer(gpsSpot); // lisätään sijaintirinkula
-			gpsSpot.setLatLng(e.latlng); // siirretään GPS positiota
-			
-
-			
 					
 			if(gps == 1){
-				console.log(gps);
+				
 				$(".leaflet-control-track-interior").addClass("toggle_one");
 			}
 			else if( gps == 2 ){
-				console.log("e"+gps);
-				$(".leaflet-control-track-interior").removeClass("toggle_one").addClass("toggle_two");
+				
+				$(".leaflet-control-track-interior").removeClass("toggle_one").addClass("toggle_border");
 				
 			}
 
