@@ -154,7 +154,9 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 		.on('locationfound', henkilo.setLocation)
 		.on('locationerror', henkilo.onLocationError)
 		.on('click', henkilo.setLocation)
-		.on('zoomend', onZoomend);
+		.on('moveend', onZoomend)
+		//.on('viewreset', onZoomend)
+		//.on('zoomend', onZoomend);
 		
 		this.controllerit = function()
 		{
@@ -199,7 +201,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 
 			self.map.locate( {
 						watch:true,setView: seuranta, 
-						maxZoom:self.map.getZoom(), maximumAge:500, 
+						maxZoom:16, maximumAge:500, 
 						enableHighAccuracy: true 
 					} ); // avataan uusi haku
 			
@@ -221,20 +223,19 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 			
 			self.locate(true); // for now avataan aina uusi tracki, jotta maxZoom lvl olisi haluttu
 	     	
-	     	/*
-		     setTimeout(function(){
-		     	$(".leaflet-marker-icon").css("z-index", "300 !important");
-		     }, 100);
-		     setTimeout(function(){
-		     	$(".leaflet-marker-icon").css("z-index", "300 !important");
-		     }, 200);
-		     setTimeout(function(){
-		     	$(".leaflet-marker-icon").css("z-index", "300 !important");
-		     }, 300);
-		     setTimeout(function(){
-		     	$(".leaflet-marker-icon").css("z-index", "300 !important");
-		     }, 1000);
-		    */
+	     	function doit(){
+	     		console.log("doit");
+	     		 $(".leaflet-clickable.maki-marker-icon").css("z-index", "900");
+	     		 $(".leaflet-zoom-animated").css("z-index", "0");
+	     	}
+	     	
+		     setTimeout(doit, 300);
+		     setTimeout(doit, 500);
+		     setTimeout(doit, 1000);
+		     
+		  
+
+		    
 		}
 		
 		this.MerkitLkm = function()
@@ -600,6 +601,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 			else{
 				console.log("e"+gps);
 				$(".leaflet-control-track-interior").removeClass("toggle_one").addClass("toggle_two");
+				kartta.map.panTo(e.latlng);
 			}
 
 			if(self.addMerkki)

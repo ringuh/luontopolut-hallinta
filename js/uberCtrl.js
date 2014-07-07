@@ -33,20 +33,26 @@ appCtrl.controller('uberCtrl', ['$scope',
     apiUrl: "https://api.tiles.mapbox.com/v3/marker/",
     xsmallOptions: {
       iconSize: [15, 35],
+      shadowSize: [15, 35],
       popupAnchor: [0,-15],
       className: "tiny-marker"
     },
     smallOptions: {
       iconSize: [20, 50],
+      shadowSize: [20, 50],
       popupAnchor: [0,-20]
     },
     mediumOptions: {
       iconSize: [30,70],
+      shadowSize: [30,70],
       popupAnchor: [0,-30]
+      
     },
     largeOptions: {
       iconSize: [36,90],
+      shadowSize: [36,90],
       popupAnchor: [0,-40]
+      
     }
   };
 
@@ -87,7 +93,7 @@ appCtrl.controller('uberCtrl', ['$scope',
 
 
       pin = "pin-" + options.size;
-      if( options.size = "xs" )
+      if( options.size == "xs" )
         pin = "pin-s";
 
       if (options.icon !== null) {
@@ -101,7 +107,7 @@ appCtrl.controller('uberCtrl', ['$scope',
 
         pin += "+" + options.color;
       }
-
+      options.shadowUrl = "" + L.MakiMarkers.apiUrl + pin +  ".png";
       options.iconUrl = "" + L.MakiMarkers.apiUrl + pin +  ".png";
       options.iconRetinaUrl = L.MakiMarkers.apiUrl + pin + "@2x.png";
     }

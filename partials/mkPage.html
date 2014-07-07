@@ -24,7 +24,7 @@
 		<h3> Tiedostot: </h3>
 		<table>
 			<tr ng-repeat="tiedosto in kuvat" ><td><a target="_blank" href="{{php}}/{{tiedosto}}">{{tiedosto}}</a></td><td><input type="button" class="smallButton" value="Poista" ng-click="poistaTiedosto(tiedosto)" /></td>
-			<td><input type="button" class="smallButton" value="Liitä" ng-click="liitaKoodiin(tiedosto)" />
+			<td><input type="button" class="smallButton green" value="Liitä" ng-click="liitaKoodiin(tiedosto)" />
 			</td>
 			</tr>
 		</table>

@@ -303,3 +303,13 @@ input[type=button]
   margin-bottom:60px;
 
 }
+
+#lisaaTiedosto input[type=file]
+{
+  margin:5px 20px 30px 0px;
+}
+
+.green
+{
+  background-color:lightgreen !important;
+}

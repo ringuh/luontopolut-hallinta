@@ -1,4 +1,4 @@
-appCtrl.controller('mkPageCtrl', ['$scope', 'siirto', '$http', '$route', function($scope, siirto, $http, $route ) {
+appCtrl.controller('mkPageCtrl', ['$scope', 'siirto', '$http', '$location', function($scope, siirto, $http, $location ) {
  	
  	var id = "";
  	var rajapinta_ = siirto.rajapinta;
@@ -23,6 +23,7 @@ appCtrl.controller('mkPageCtrl', ['$scope', 'siirto', '$http', '$route', functio
 			if( !isNaN(data) )
 			{
 				$scope.select = data;
+				$scope.sivuSpinner = data;
 				$('#noty').noty({text: "Sivu tallennettiin", type:"success", timeout:"2000", dismissQueue:false});
 
 				try{
@@ -85,6 +86,7 @@ appCtrl.controller('mkPageCtrl', ['$scope', 'siirto', '$http', '$route', functio
  			$scope.sivuNimi = "";
 	 		$scope.tekstiKentta = "";
 	 		$scope.textArea = "";
+	 		$scope.sivuSpinner = -1;
 	 	}
 
  		$http.post( rajapinta_, { 
@@ -149,6 +151,9 @@ appCtrl.controller('mkPageCtrl', ['$scope', 'siirto', '$http', '$route', functio
                    $noty.close();
                    
 				   $scope.poistaTiedosto(null);
+
+
+
                }
            },
            {
