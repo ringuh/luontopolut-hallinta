@@ -154,9 +154,9 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 		.on('locationfound', henkilo.setLocation)
 		.on('locationerror', henkilo.onLocationError)
 		.on('click', henkilo.setLocation)
-		.on('moveend', onZoomend)
+		.on('moveend', moveEnd)
 		//.on('viewreset', onZoomend)
-		//.on('zoomend', onZoomend);
+		.on('zoomend', onZoomend);
 		
 		this.controllerit = function()
 		{
@@ -196,12 +196,18 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 			self.map.stopLocate(); // tapetaan edellinen haku
 			
 			var seuranta = false;
+			var zoom = 17;
 			if( bool == 2)
+			{
+				//$('#noty').noty({text: seuranta + " " + zoom, type:"error", timeout:"2000", dismissQueue:false});
+				
 				seuranta = true;
+				zoom = self.map.getZoom();
+			}
 
 			self.map.locate( {
 						watch:true,setView: seuranta, 
-						maxZoom:16, maximumAge:500, 
+						maxZoom:zoom, maximumAge:500, 
 						enableHighAccuracy: true 
 					} ); // avataan uusi haku
 			
@@ -221,21 +227,18 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 			// currently: säätää "omalokaatio-ympyrän" piirtosädettä METREISSÄ
 			console.log("Kartta: onZoomend "+self.map.getZoom());
 			
-			self.locate(true); // for now avataan aina uusi tracki, jotta maxZoom lvl olisi haluttu
-	     	
+			self.locate(henkilo.getGps()); // for now avataan aina uusi tracki, jotta maxZoom lvl olisi haluttu
+	    }
+	    function moveEnd(){
 	     	function doit(){
 	     		console.log("doit");
 	     		 $(".leaflet-clickable.maki-marker-icon").css("z-index", "900");
-	     		 $(".leaflet-zoom-animated").css("z-index", "0");
+	     		 $(".leaflet-zoom-animated").css("z-index", "5");
 	     	}
 	     	
 		     setTimeout(doit, 300);
 		     setTimeout(doit, 500);
 		     setTimeout(doit, 1000);
-		     
-		  
-
-		    
 		}
 		
 		this.MerkitLkm = function()
@@ -564,7 +567,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 				
 				gpsSpot.setLatLng(e.latlng);
 				
-				if( e. accuracy != null)
+				if( e. accuracy != null && gps != 0)
 					gpsSpot.setAccuracy(e.accuracy);
 				
 			}
@@ -598,10 +601,10 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 				console.log(gps);
 				$(".leaflet-control-track-interior").addClass("toggle_one");
 			}
-			else{
+			else if( gps == 2 ){
 				console.log("e"+gps);
 				$(".leaflet-control-track-interior").removeClass("toggle_one").addClass("toggle_two");
-				kartta.map.panTo(e.latlng);
+				
 			}
 
 			if(self.addMerkki)
