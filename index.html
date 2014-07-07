@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="css/app.css"/>
   <link rel="stylesheet" href="css/leaflet.css" />
   <link rel="stylesheet" href="css/leaflet-usermarker.css" />
+  <link rel="stylesheet" href="bower_components/marker-cluster/MarkerCluster.Default.css" />
   
 </head>
 <body ng-controller="uberCtrl">
@@ -20,7 +21,7 @@
     <div ng-click="goTo('/newPage')">Sivu</div>
   </div>
 
-  <div id="noty" style="position:absolute;"></div>
+  <div id="noty" style="position:fixed;top:0px"></div>
 
 
   <div ng-view></div>
@@ -31,6 +32,7 @@
 	
   
   <script src="js/leaflet.js"></script>
+  <script src="bower_components/marker-cluster/leaflet.markercluster.js"></script>
 
 
 	

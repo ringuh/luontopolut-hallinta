@@ -10,7 +10,7 @@ appCtrl.controller('mkPageCtrl', ['$scope', 'siirto', '$http', '$route', functio
  	init();
 
  	$scope.savePage = function(){
- 		//alert("save"+rajapinta_);
+ 		console.log("save"+rajapinta_);
  		$http.post( rajapinta_, { 
  			cmd: "savePage", value: $scope.tekstiKentta, eng: $scope.textArea,
  			id: $scope.sivuSpinner, tunniste: $scope.sivuNimi 
@@ -25,6 +25,13 @@ appCtrl.controller('mkPageCtrl', ['$scope', 'siirto', '$http', '$route', functio
 				$scope.select = data;
 				$('#noty').noty({text: "Sivu tallennettiin", type:"success", timeout:"2000", dismissQueue:false});
 
+				try{
+					$scope.$digest();
+				}
+				catch(e)
+				{
+					console.log(e);
+				}
 			}
 			else
 				$('#noty').noty({text: data, type:"error", timeout:"2000", dismissQueue:false});
@@ -153,5 +160,13 @@ appCtrl.controller('mkPageCtrl', ['$scope', 'siirto', '$http', '$route', functio
            }
 		   ]
 		});
- 	}
+ 	};
+
+ 	$scope.liitaKoodiin = function(file)
+ 	{
+ 		console.log(file);
+ 		$scope.tekstiKentta += "\n<img src='"+file+"' />";
+ 		$scope.textArea += "\n<img src='"+file+"' />";
+ 	};
+
 }]);

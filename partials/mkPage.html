@@ -23,9 +23,12 @@
 	<div ng-hide="sivuSpinner == '-1'" >
 		<h3> Tiedostot: </h3>
 		<table>
-			<tr ng-repeat="tiedosto in kuvat" ><td><a target="_blank" href="{{php}}/{{tiedosto}}">{{tiedosto}}</a></td><td><input type="button" class="smallButton" value="Poista" ng-click="poistaTiedosto(tiedosto)"></td></tr>
+			<tr ng-repeat="tiedosto in kuvat" ><td><a target="_blank" href="{{php}}/{{tiedosto}}">{{tiedosto}}</a></td><td><input type="button" class="smallButton" value="Poista" ng-click="poistaTiedosto(tiedosto)" /></td>
+			<td><input type="button" class="smallButton" value="Liitä" ng-click="liitaKoodiin(tiedosto)" />
+			</td>
+			</tr>
 		</table>
-		<form action="{{rajapinta_}}" method="post"
+		<form id="lisaaTiedosto" action="{{rajapinta_}}" method="post"
 			enctype="multipart/form-data">
 			<label for="file">Filename:</label>
 			<input type="file" name="file" id="file"><br>

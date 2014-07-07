@@ -86,20 +86,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 		openVerho();
 		$("#popup").hide();
 		$("#reittiEdit").show();
-/*
-		$http.post( siirto.rajapinta, { cmd: "tallennaMerkit", id: $scope.siirto, value: merkit })
-			.success( function(data){
-				console.log( "Tallenna Merkit\n"+JSON.stringify(data) );
-				
-				var n = $('#noty').noty({text: 'Kohteet tallennettu!', type:"success", timeout:"2000", dismissQueue:false});
-				
-			})
-			.error( function(){
-				
-				$('#noty').noty({text: 'Kohteiden tallennus epäonnistui', type:"error", timeout:"2000", dismissQueue:false});
-				
-			});
-*/
+
 	};
 
 	$scope.editTrailPost = function()
@@ -141,7 +128,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 		this.tiilit = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 		this.southWest = L.latLng(60.0, 22.73);
     	this.northEast = L.latLng(62.48, 24.83);
-    	this.minZoom = 10;
+    	this.minZoom = 1;
     	this.maxZoom = 19;
     	
     	this.gps = false;
@@ -233,32 +220,21 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 			console.log("Kartta: onZoomend "+self.map.getZoom());
 			
 			self.locate(true); // for now avataan aina uusi tracki, jotta maxZoom lvl olisi haluttu
-	     	var radius = 2;
-	     	if( self.map.getZoom() < 11)
-	     		radius = 30;
-	     	else if( self.map.getZoom() < 13)
-	     		radius = 20;
-	     	else if( self.map.getZoom() < 15)
-	     		radius = 10;
-	     	else if( self.map.getZoom() < 17)
-		     	radius = 5;
-		     
-		     radius = radius * (20 - self.map.getZoom())*4;
-
-
+	     	
+	     	/*
 		     setTimeout(function(){
-		     	$(".leaflet-user-marker").css("z-index", "300 !important");
+		     	$(".leaflet-marker-icon").css("z-index", "300 !important");
 		     }, 100);
 		     setTimeout(function(){
-		     	$(".leaflet-user-marker").css("z-index", "300 !important");
+		     	$(".leaflet-marker-icon").css("z-index", "300 !important");
 		     }, 200);
 		     setTimeout(function(){
-		     	$(".leaflet-user-marker").css("z-index", "300 !important");
+		     	$(".leaflet-marker-icon").css("z-index", "300 !important");
 		     }, 300);
 		     setTimeout(function(){
-		     	$(".leaflet-user-marker").css("z-index", "300 !important");
+		     	$(".leaflet-marker-icon").css("z-index", "300 !important");
 		     }, 1000);
-		     //henkilo.gpsSpot.setRadius(radius);
+		    */
 		}
 		
 		this.MerkitLkm = function()
@@ -583,17 +559,18 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 		this.setLocation = function(e)
 		{
 			try{
-				gpsSpot.setAccuracy(e.accuracy);
-				//$scope.lkm = e.altitude + " "+ e.altitudeAccuracy; 
-				// riippuu selaimesta? toimii lumia520, ei nexus7
+				gpsSpot.addTo(kartta.map);
 				
+				gpsSpot.setLatLng(e.latlng);
+				
+				if( e. accuracy != null)
+					gpsSpot.setAccuracy(e.accuracy);
 				
 			}
 			catch(e)
 			{
-				console.log(e);
-				gpsSpot.setAccuracy((20-kartta.map.getZoom())*15 );
-			}
+				console.log(e.message);
+			}			
 			console.log("Henkilo:setLocation ");
 			console.log(e.latlng);
 			location = [ e.latlng.lat, e.latlng.lng ];
@@ -752,6 +729,15 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 		  };
 		var polyline;
 
+		this.clusters = L.markerClusterGroup({ // alustetaan markercluster
+			disableClusteringAtZoom: 19,
+			maxClusterRadius: 100,
+			spiderfyOnMaxZoom: false, 
+			showCoverageOnHover: true, 
+			zoomToBoundsOnClick: true,							
+			
+	 	});
+
 		this.ToggleTrack = function(){
 			track = !track;
 
@@ -770,24 +756,25 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 			if( pisteet.length > 0)
 			{
 				var dist = pisteet[pisteet.length-1].distanceTo(e.latlng, lisaysRaja);
-				if( dist > lisaysRaja )
+				if( dist > lisaysRaja && dist < 5000 )
 				{ // otetaan ylös 
-					pisteet.push( new Piste( e ));
-					drawPolyline();
+					pisteet.push( new Piste( e, kartta ));
+					self.drawPolyline();
 					
 				}
 
 				
 			}
 			else{
-				pisteet.push( new Piste( e ));
+				pisteet.push( new Piste( e, kartta ));
 				
 			}
 			
 		};
 
-		function drawPolyline()
+		this.drawPolyline = function()
 		{
+			console.log("draw polyline");
 			try{
 				
 				kartta.map.removeLayer(polyline); // koitetaan poistaa edellinen
@@ -804,6 +791,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 
 			polyline = L.polyline(piirtopisteet, polyline_options).addTo(kartta.map);
 			$scope.etaisyys = self.Pituus();
+			kartta.map.addLayer(self.clusters);
 			try{
 				$scope.$digest();
 			}
@@ -851,10 +839,10 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 				{
 					var leikkiPiste = {"latlng":L.latLng(data[i]["latitude"], data[i]["longitude"]), "altitude": parseInt(data[i]["altitude"]), "distance": parseInt(data[i]["distance"])};
 					
-					var x = new Piste(leikkiPiste);
+					var x = new Piste(leikkiPiste, kartta);
 					pisteet.push(x);
 				}
-				drawPolyline();
+				self.drawPolyline();
 				
 				
 			})
@@ -867,17 +855,44 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 		this.clear = function(){
 			
 			pisteet = [];
-			drawPolyline();
+			self.drawPolyline();
 		};
+
+		this.removePiste = function(piste)
+		{
+			console.log("remove piste");
+			for( var i in pisteet )
+			{
+				if( pisteet[i] == piste )
+				{
+					
+					piste.hide();
+					piste = null;
+
+					pisteet.splice(i, 1);
+					self.drawPolyline();	
+					
+						
+				}
+			}
+		};
+
+		
 	}
 
-	function Piste(e)
+	function Piste(e, kartta)
 	{
+		var self = this;
 		this.latlng = e.latlng;
 		this.lat = e.latlng.lat;
 		this.lng = e.latlng.lng;
 		this.altitude = 0;
 		this.distance = 0;
+
+		var iconi = L.MakiMarkers.icon({icon: "rocket", color: '#fff', size: 'xs'});
+		var marker = L.marker(e.latlng, { draggable:true, icon: iconi})
+					.on('dragend', onDragEnd)
+					.addTo(kartta.reitti.clusters);
 
 		try{
 
@@ -915,6 +930,43 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 
 			return ret;
 		};
+
+		this.hide = function()
+		{
+			try{
+				kartta.map.removeLayer(marker);
+				
+			}
+			catch(e)
+			{
+				console.log(e.message);
+			}
+		};
+
+		function onDragEnd(e)
+		{
+			console.log(self.latlng +" vs "+marker.getLatLng());
+			self.latlng = marker.getLatLng();
+			self.lat = self.latlng.lat;
+			self.lng = self.latlng.lng;
+			// merkki poistetaan, mikäli sitä liikuttaa kerralla 200 pixeliä 
+			// tai 1/3 näytön leveydestä pieninäyttöisillä laitteilla ( esim lumia 520 se on 100px) 
+			if( e.distance > screen.width/3 || e.distance > 200 ) 
+			{
+				console.log("siirryttiin: "+e.distance);
+				
+				kartta.reitti.removePiste(self);
+
+
+			}
+			else
+			{
+				console.log("else");
+				kartta.reitti.drawPolyline();
+			}
+
+			
+		}
 	}
 
 	
