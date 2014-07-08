@@ -293,7 +293,7 @@ body
 
 #popup select
 {
-  font-size:38px;
+  font-size:8vw;
 }
 
 #popup input[type=checkbox]
@@ -309,7 +309,7 @@ body
 
 #verho > h1,h2,h3,h4,h5,h6
 {
-  color:black !important;
+  /*color:black !important;*/
 }
 
 #reittiEdit
