@@ -1,7 +1,6 @@
 	<div id="verho">
 		<div id="popup" ng-init="valittuMerkki.icon = 'circle'; valittuMerkki.size = 'l'; valittuMerkki.color='b0b' ">
-		<div style="margin-bottom:20px;">
-			<input type="button" style="font-size:28px;" value="Sulje" ng-click="verhoHide();valittuMerkki.onSave()" /> <span style="font-size:18px;">Muutokset tallentuvat, mikäli painat tallennuskuvaketta</span> </div>
+
 			<div>
 			<div style="position:relative"  ng-swipe-left="imgSwipeLeft()" ng-swipe-right="imgSwipeRight()" >
 			<h2> Säädä kuvake </h2>
@@ -29,14 +28,16 @@
 				<label for="checkbox">Avattavissa:</label>
 				<input name="checkbox" type="checkBox" ng-init="valittuMerkki.clickable = 'false'" ng-model="valittuMerkki.clickable" />
 				</div>
-			
+				<div style="margin:20px 0px;">
+			<input type="button" style="font-size:28px;" value="Sulje/Tallenna" ng-click="verhoHide();valittuMerkki.onSave()" /> <span style="font-size:18px;">Muutokset tallentuvat, mikäli painat tallennuskuvaketta</span> 
+		</div>
 			</div>
 
 
 			
 			</div>
 			<h3> Merkin tunniste ja sivu, johon se linkkaa </h3>
-						<label for="tunniste">Tunniste:</label><br/><input nimi="tunniste" type="text" ng-init="valittuMerkki.nimi = 'Oletustunniste'" ng-model="valittuMerkki.nimi" placeholder="Nimeä merkki. Esim Näsinneula" /> <br/>
+						<label for="tunniste">Tunniste:</label><br/><input nimi="tunniste" type="text" ng-init="valittuMerkki.nimi = 'Oletustunniste'" ng-model="valittuMerkki.nimi" placeholder="Nimeä merkki. Esim Näsinneula" /> <br/><br/>
 			
 
 			<label for="sivusto">Avattava sivu:</label><br/>
@@ -47,6 +48,13 @@
 				</option>
 
 			</select>
+			<p>Hälytyksen raja:
+			<select ng-model="valittuMerkki.halytysraja">
+				<option value="5"> 5 m </option>
+				<option value="10"> 10 m </option>
+				<option value="20"> 20 m </option>
+				<option value="20"> 50 m </option>
+			</select></p>
 			
 <!---->
 

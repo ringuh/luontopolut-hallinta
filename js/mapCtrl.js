@@ -17,15 +17,12 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 		$scope.lkm = kartta.MerkitLkm();
 		
 		$(".leaflet-control").click( function(){
-		//alert("!");
-		
-		$(this).animate({
-						opacity:0.2
-					}, "slow" ).animate({
-						opacity:1.0
-					}, "slow");		
-
-	});
+			$(this).animate({
+							opacity:0.2
+						}, "slow" ).animate({
+							opacity:1.0
+						}, "slow");		
+		});
 	}	
 
 	
@@ -108,7 +105,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 				console.log( "Tallenna Merkit\n"+JSON.stringify(data) );
 				
 				var n = $('#noty').noty({text: 'Reitti tallennettu!', type:"success", timeout:"2000", dismissQueue:false});
-				
+				localStorage.setItem("valittuAlueNimi", $scope.reitinNimi);
 			})
 			.error( function(){
 				
@@ -635,7 +632,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 		
 
 		
-		this.halytysraja = 10;
+		this.halytysraja = 20;
 
 		this.id = -1;
 		this.clickable = true;
