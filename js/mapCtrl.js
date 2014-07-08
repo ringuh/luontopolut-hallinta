@@ -16,8 +16,19 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 		kartta.controllerit();
 		$scope.lkm = kartta.MerkitLkm();
 		
+		$(".leaflet-control").click( function(){
+		//alert("!");
+		
+		$(this).animate({
+						opacity:0.2
+					}, "slow" ).animate({
+						opacity:1.0
+					}, "slow");		
 
-	}
+	});
+	}	
+
+	
 
 	$scope.verhoHide = function(){
 		$("#verho").fadeOut("slow");
@@ -125,7 +136,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 		var self = this;
 		var henkilo = new Henkilo(self);
 		this.reitti = new Reitti(self);
-		this.tiilit = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+		this.tiilit = 'http://otile1.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg';
 		this.southWest = L.latLng(60.0, 22.73);
     	this.northEast = L.latLng(62.48, 24.83);
     	this.minZoom = 1;
@@ -138,9 +149,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
     	this.tileLayer = L.tileLayer( this.tiilit, { 
 				minZoom: this.minZoom,
 				maxZoom: this.maxZoom,
-				attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-					'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-					'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+				attribution: 'Tiles by <a href="http://www.mapquest.com/">MapQuest</a> &mdash; Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
 				id: 'HallintaMap',//,
 				bounds: L.latLngBounds(this.southWest, this.northEast)
 
@@ -375,7 +384,9 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 					.addListener(controlDiv, 'click', L.DomEvent.stopPropagation)
 					.addListener(controlDiv, 'click', L.DomEvent.preventDefault)
 				.addListener(controlDiv, 'click', function () { 
-					self.lisaaMerkki();					
+					
+					self.lisaaMerkki();
+								
 				});
 
 				var controlUI = L.DomUtil.create('div', 'leaflet-control-marker-interior', controlDiv);
