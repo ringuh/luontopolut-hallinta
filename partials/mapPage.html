@@ -53,11 +53,10 @@
 				<option value="5"> 5 m </option>
 				<option value="10"> 10 m </option>
 				<option value="20"> 20 m </option>
-				<option value="20"> 50 m </option>
+				<option value="50"> 50 m </option>
 			</select></p>
 			
-<!---->
-
+			
 
 			
 
@@ -83,13 +82,29 @@
 			</form>
 
 			<p> poista koko rata kirjoittamalla nimeksi '-1' ja tallentamalla </p>
+
+			<h3> Tagit: </h3>
+			<table>
+				<tr ng-repeat="tag in tagit">
+					<td style="padding:5px 20px">
+						{{tag.tagi}}
+					</td>
+					<td>
+						<input type="button" ng-click="deleteTag(tag)" value="Poista" />
+					</td>
+				</tr>
+			</table>
+			<br/>
+
+			<input type="text" ng-model="newTag" placeholder="Lisää uusi tagi"/>
+			<input type="button" class="smallButton" ng-click="addTag()" value="Lisää"/>
 		</div><!-- end of reittiedit -->
 	</div>
 	<div style="font-size:5vh;width:100%;">
 		<div style="float:left;overflow-x:hide">
 		
 		{{reitinNimi}} </div>
-		<div id="etaisyys" style="float:right;" ng-init="lkm = 0;etaisyys = 0">POI: {{lkm}} | {{etaisyys}}m </div>
+		<div id="etaisyys" style="float:right;" ng-init="lkm = 0;etaisyys = 0">POI: {{lkm}} | Reitin pituus: {{etaisyys}}m </div>
 		<!--<input type="button" style="height:auto;width:auto;font-size:inherit;margin-top:10px;" ng-click="editTrail()" value="Muokkaa" />-->
 	</div>
 	<div id="map"></div>

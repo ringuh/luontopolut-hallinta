@@ -48,7 +48,12 @@
 			$db->GetTargets($id);
 		else if( $cmd == "haeClient" )
 			$db->GetClient();
-	
+		else if( $cmd == "getTagit" )
+			$db->GetTags($id);
+		else if( $cmd == "tallennaTagi")
+			$db->AddTags($id, $value);
+		else if( $cmd == "poistaTagi" && isset($id))
+			$db->DeleteTag($id);	
 
 			
 			

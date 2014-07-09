@@ -341,6 +341,51 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 			});
 		};
 
+		function haeTagit()
+		{
+			$http.post( siirto.rajapinta, { cmd: "getTagit", id: siirto.alue })
+			.success( function(data){
+				console.log( "Haettiin tagit\n"+data );
+				$scope.tagit = data;
+				
+			})
+			.error( function(){
+				
+				$('#noty').noty({text: 'Tagien haku epäonnistui', type:"error", timeout:"2000", dismissQueue:false});
+				
+			});
+		}
+
+		haeTagit();
+
+		$scope.addTag = function()
+		{
+			$http.post( siirto.rajapinta, { cmd: "tallennaTagi", id: siirto.alue, value: $scope.newTag })
+			.success( function(data){
+				console.log( "Tallennettiin tagi\n"+data );
+				haeTagit();
+			})
+			.error( function(){
+				
+				$('#noty').noty({text: 'Tagin tallennus epäonnistui', type:"error", timeout:"2000", dismissQueue:false});
+				
+			});
+		};
+
+		$scope.deleteTag = function(tag)
+		{
+			$http.post( siirto.rajapinta, { cmd: "poistaTagi", id: tag.id })
+			.success( function(data){
+				console.log( "Poistettiin tagi\n"+data );
+				haeTagit();
+				
+			})
+			.error( function(){
+				
+				$('#noty').noty({text: 'Tagin poisto epäonnistui', type:"error", timeout:"2000", dismissQueue:false});
+				
+			});
+		};
 		/*
 		 	KONTROLLERIT, eli ZOOM yms ikonit kartassa.
 		 */
@@ -663,6 +708,8 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 		
 		function onMarkerClick(e)
 		{
+			
+
 
 			$scope.valittuMerkki = self;
 			$scope.colors = siirto.colors;
@@ -695,7 +742,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 
 		if( init != null)
 		{
-			console.log( "jou\n" );
+			
 			//{"id":"1","tlp_rata_id":"4","tlp_sivu_id":"-1","nimi":"defaultNimi","latitude":"61.4982","longitude":"23.7611","clickable":"0","halytysraja":"10","icon":"circle","color":"b0b","size":"l"},
 			this.id = init.id;
 			this.sivuID = init.tlp_sivu_id;
@@ -885,7 +932,6 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 				}
 			}
 		};
-
 
 		
 	}

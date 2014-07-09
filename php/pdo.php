@@ -371,7 +371,7 @@
 				echo $sth->rowCount();
 			}
 
-			
+			$this->OfflineMerkit($value);
 			return;
 
 			
@@ -432,8 +432,7 @@
 			
 			if( $sth->rowCount() > 0)
 				echo "success - removed kohteet of $id";
-			else
-				echo "DeleteKohde - rowcount0<hr>";
+			
 		}
 		
 		function DeletePath( $id )
@@ -459,8 +458,7 @@
 			
 			if( $sth->rowCount() > 0)
 				echo "success - removed tagit of $id";
-			else
-				echo "DeleteTagit - rowcount0<hr>";
+			
 		}
 		
 		function DeleteSivu( $id )
@@ -472,8 +470,7 @@
 			
 			if( $sth->rowCount() > 0)
 				echo "success - removed sivu of $id";
-			else
-				echo "DeleteSivut - rowcount0<hr>";
+			
 		}
 
 		function DeleteRata( $id )
@@ -485,10 +482,50 @@
 			
 			if( $sth->rowCount() > 0)
 				echo "success - removed rata of $id";
-			else
-				echo "DeleteSivut - rowcount0<hr>";
+			
 		}
 		
+		function GetTags($id)
+		{
+			$str;
+
+			if( $id == null)
+			{
+				$str = "select * from $this->tagi_";
+				$sth = $this->db->prepare($str);
+				
+			}
+			else
+			{
+				$str = "select * from $this->tagi_ where tlp_rata_id = :id";
+				$sth = $this->db->prepare($str);
+				$sth->bindParam(":id", $id, PDO::PARAM_INT );
+				
+			}
+
+			$sth->execute();
+			echo json_encode( $sth->fetchAll(PDO::FETCH_CLASS) );	
+		}
+
+		function AddTags($id, $value)
+		{
+			$str = "insert into $this->tagi_(tlp_rata_id, tagi) VALUES (:id, :arvo )";
+			$sth = $this->db->prepare($str);
+			$sth->bindParam(":id", $id, PDO::PARAM_INT );
+			$sth->bindParam(":arvo", $value, PDO::PARAM_STR );
+			$sth->execute();
+
+			
+		}
+
+		function DeleteTag($id)
+		{
+			$str = "delete from $this->tagi_ where id = :id";
+			$sth = $this->db->prepare($str);
+			$sth->bindParam(':id', $id, PDO::PARAM_INT);
+			$sth->execute();
+		}
+
 		function GetFiles( $id )
 		{
 			
@@ -576,6 +613,65 @@
 			  }
 			} else {
 			  echo "Invalid file";
+			}
+		}
+
+		function OfflineMerkit($value)
+		{
+			//echo "\n".json_encode( $value );
+			$baseUrl = "markers/";
+
+			if (!file_exists($baseUrl)) 
+				mkdir($baseUrl);
+
+			foreach( $value as $x )
+			{
+				$icon = $x["icon"];
+				$size = $x["size"];
+				$color = $x["color"];
+				$visited = "C0C0C0";
+				$pinA = "pin-$size-$icon+$color.png";
+				$pinB = "pin-$size-$icon+$color@2x.png";
+
+				$pinAS = "pin-$size-$icon+$visited.png";
+				$pinBS = "pin-$size-$icon+$visited@2x.png";
+
+				$url = "https://api.tiles.mapbox.com/v3/marker/";
+				
+				$this->downloadFile($url.$pinA, $baseUrl.$pinA);
+				$this->downloadFile($url.$pinB, $baseUrl.$pinB); 
+				$this->downloadFile($url.$pinA, $baseUrl.$pinAS);
+				$this->downloadFile($url.$pinB, $baseUrl.$pinBS);                               
+			}
+
+
+		}
+
+		private function downloadFile ($url, $path) 
+		{
+
+			if( file_exists($path) )
+				return;
+
+			echo "DL:$path | ";
+			$newfname = $path;
+			$file = fopen ($url, "rb");
+			if ($file) {
+				$newf = fopen ($newfname, "wb");
+
+				if ($newf)
+					while(!feof($file)) 
+					{
+					  fwrite($newf, fread($file, 1024 * 8 ), 1024 * 8 );
+					}
+			}
+
+			if ($file) {
+				fclose($file);
+			}
+
+			if ($newf) {
+				fclose($newf);
 			}
 		}
 	}
