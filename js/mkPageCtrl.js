@@ -1,5 +1,5 @@
 appCtrl.controller('mkPageCtrl', ['$scope', 'siirto', '$http', '$location', function($scope, siirto, $http, $location ) {
- 	
+ 	siirto.thingToHide = 2;
  	var id = "";
  	var rajapinta_ = siirto.rajapinta;
  	$scope.rajapinta_ = siirto.rajapinta;
@@ -16,9 +16,7 @@ appCtrl.controller('mkPageCtrl', ['$scope', 'siirto', '$http', '$location', func
  			id: $scope.sivuSpinner, tunniste: $scope.sivuNimi 
  		})
 		.success( function(data){
-			//alert( data );
 			
-			//init();
 
 			if( !isNaN(data) )
 			{

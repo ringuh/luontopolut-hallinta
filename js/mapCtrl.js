@@ -5,7 +5,7 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 	$scope.reitinNimi = siirto.alueNimi;
 	$scope.sivuVaihtoehdot = [];
 	$scope.merkit = L.MakiMarkers.icons;
-
+	siirto.thingToHide = 1;
 	
 	var kartta = new Kartta();	
 	
@@ -25,13 +25,22 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 		});
 	}	
 
+	//document.removeEventListener("backbutton", onBackKeyDown, false);
+	
+
 	
 
 	$scope.verhoHide = function(){
+
+		//alert("mapctrl verhohide");
+		siirto.thingToHide = 2;
 		$("#verho").fadeOut("slow");
+		
 	};
 
 	function openVerho(){
+		//alert("openVerho");
+		siirto.thingToHide = 3;
 		$("#verho").fadeIn("slow");
 
 	}
@@ -60,17 +69,13 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 		
 		$scope.valittuMerkki.icon = $scope.merkit[i];
 	};
-	$scope.$watch( 'vari', function(x,y){
-		//alert(x +" "+ y);
-	});
+	
 	
 	$scope.internetExplorer = function(tt)
 	{
 		setTimeout(function(){
 			$("."+tt).css("background-color", "#"+tt).css("color", "#"+tt );
 		}, 1000);
-		
-		//return "{{background-color:#"+tt+"}}";
 
 	};
 
@@ -710,11 +715,12 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 		{
 			
 
-
+			$("#reittiEdit").hide();
+			$("#popup").show();
 			$scope.valittuMerkki = self;
 			$scope.colors = siirto.colors;
 			$scope.kuva = self.icon;
-			$("#verho").fadeIn("slow");
+			openVerho();
 			$scope.$digest();
 		}
 

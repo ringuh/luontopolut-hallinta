@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="myApp" class="no-js">
+<html lang="en" class="no-js">
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -27,11 +27,12 @@
 
   <div ng-view></div>
 
-	<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-	<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+	<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 	<script type="text/javascript" src="js/noty/packaged/jquery.noty.packaged.min.js"></script>
 	
-  
+  <script src="cordova.js"></script><!--CORDOVA MOBiiLi ONLY -->
+
   <script src="js/leaflet.js"></script>
   <script src="bower_components/marker-cluster/leaflet.markercluster.js"></script>
 
@@ -54,6 +55,24 @@
   <script src="js/filters.js"></script>
   <script src="js/directives.js"></script>
   <script src="js/leaflet.js"></script>
+
+  <script>
+    //angular.bootstrap(document, ['myApp']); // UNCOMMENT JOS EI MOBIILI
+  
+  /*
+    VAIN MOBIILILAITTEILLE
+  */ 
+   
+  document.addEventListener("deviceready", function() {
+        angular.element(document).ready(function () {
+            angular.bootstrap(document, ['myApp']);
+            //navigator.splashscreen.hide();
+        });
+    }, false);
+  
+  /*
+  */
+  </script>
  
 </body>
 </html>

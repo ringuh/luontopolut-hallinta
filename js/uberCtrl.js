@@ -1,10 +1,36 @@
 'use strict';
 
 
-appCtrl.controller('uberCtrl', ['$scope', 
-	function($scope){
+appCtrl.controller('uberCtrl', ['$scope', '$location', 'siirto', 
+	function($scope, $location, siirto){
 
-	
+    
+
+    function onBackKeyDown()
+    {
+      //alert("mapctrl back key"+siirto.thingToHide);
+      if( siirto.thingToHide == 0)
+        navigator.app.exitApp();
+      else if( siirto.thingToHide == 1)
+        $location.path("/etusivu");
+      else if( siirto.thingToHide == 2)
+        $location.path("/map");
+      else if( siirto.thingToHide == 3)
+      {
+        siirto.thingToHide = 1;
+        $("#verho").fadeOut("slow");
+      }
+      
+      try
+      {
+        $scope.$apply();
+      }
+      catch(e)
+      {
+        console.log(e.message);
+      }
+    }
+    document.addEventListener("backbutton", onBackKeyDown, false);
 		
 				(function () {
   "use strict";

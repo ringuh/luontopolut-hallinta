@@ -5,7 +5,7 @@
 var appCtrl = angular.module('myApp.controllers', []);
 appCtrl.controller('FrontCtrl', ['$scope', '$http', '$location', 'siirto', function($scope, $http, $location, siirto){
 	var rajapinta_ = siirto.rajapinta;
-	
+	siirto.thingToHide = 0;
 
 
 	var getPaikat = function(){ $http.post( rajapinta_, { cmd: "getRadat"})
@@ -46,6 +46,8 @@ appCtrl.controller('FrontCtrl', ['$scope', '$http', '$location', 'siirto', funct
 
 		$location.path("/map");
 	};
+	
+	
 	
 	$(document).ready(function(){
 		getPaikat();

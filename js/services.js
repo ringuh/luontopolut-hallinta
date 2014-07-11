@@ -13,6 +13,7 @@ appService.service('siirto', function(){
 	this.alueNimi = localStorage.getItem("valittuAlueNimi");
 	this.php = "http://ohjryhma1.projects.tamk.fi/maps/v2/luontopolut-hallinta/php/";
 	this.rajapinta = this.php+"rajapinta.php";
+	this.thingToHide = 0;
 
 
 	this.colors = ["b0b", 
