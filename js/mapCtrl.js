@@ -874,21 +874,43 @@ appCtrl.controller('MapCtrl', ['$scope', 'siirto', '$http', '$location',
 
 		this.Save = function()
 		{
-			var pp = [];
-			for( var i in pisteet )
-				pp.push(pisteet[i].toArray());
 			
-			$http.post( siirto.rajapinta, { cmd: "tallennaReitti", id: $scope.siirto, value: pisteet })
-			.success( function(data){
-				console.log( "Tallenna reitti\n"+data );
-				var n = $('#noty').noty({text: 'Reitti tallennettu!', type:"success", timeout:"2000", dismissQueue:false});
-				
-			})
-			.error( function(){
-				
-				$('#noty').noty({text: 'Reitin tallennus epäonnistui', type:"error", timeout:"2000", dismissQueue:false});
-				
-			});
+			var pp = [];
+			var jakaja = Math.floor(pisteet.length / 50);
+			for( var j = 0; j <= jakaja; ++j)
+			{
+				if( pp[j] == null)
+						pp[j] = [];
+				for(var i = j*50; i < j*50+50; ++i)
+				{
+					try{
+						pp[j].push( pisteet[i]);
+					}
+					catch(e)
+					{
+						console.log(e.message);
+					}
+				}
+			}
+			sendaa(0);
+
+			function sendaa(indx)
+			{
+				console.log("postaus"+i);	
+				console.log(pp.length)				
+				$http.post( siirto.rajapinta, { cmd: "tallennaReitti", id: $scope.siirto, value: pp[indx], index: indx, maxindex: jakaja })
+				.success( function(data){
+					console.log( "Tallenna reitti\n"+data );
+					var n = $('#noty').noty({text: 'Reitti tallennettu!', type:"success", timeout:"2000", dismissQueue:false});
+					if( data.indexOf("done") == -1)
+						sendaa(indx+1);
+				})
+				.error( function(){
+					
+					$('#noty').noty({text: 'Reitin tallennus epäonnistui', type:"error", timeout:"2000", dismissQueue:false});
+					
+				});
+			}
 		};
 
 		this.Load = function()

@@ -16,7 +16,7 @@
 		function __construct() {
 			$this->db = new PDO('mysql:host='.$this->dbhost_.';dbname='.$this->dbname_.';charset=utf8', $this->dbuser_, $this->dbpass_);
 			$this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-			
+
 		}
 		function Julkaistu()
 		{
@@ -29,10 +29,10 @@
 						$in .= ','.$_REQUEST['julkaisut'];
 				}
 			$in .= ')';
-			
+
 			return $in;
 		}
-		
+
 		function GetClient()
 		{
 			$ret = array();	// haetaan kaikki julkaisuvalmiit radat
@@ -46,59 +46,59 @@
 			$ret["reitit"] = array();
 			$ret["tagit"] = array();
 			$ret["sivut"] = array();
-			
+
 			//echo json_encode( $tmp );
-			
-			
+
+
 			foreach( $tmp as $rata )
 			{
-				
+
 				$id = $rata["id"];
-				
+
 				// merkit
 				$str = "select * from $this->kohde_ where tlp_rata_id = :id";
 				$sth = $this->db->prepare($str);
 				$sth->bindParam(":id", $id, PDO::PARAM_INT );
 				$sth->execute();
 				$ret["merkit"][$id] = $sth->fetchAll(PDO::FETCH_CLASS);	
-				
-				
+
+
 				// reitit
 				$str = "select * from $this->reitti_ where tlp_rata_id = :id";
 				$sth = $this->db->prepare($str);
 				$sth->bindParam(":id", $id, PDO::PARAM_INT );
 				$sth->execute();
 				$ret["reitit"][$id] = $sth->fetchAll(PDO::FETCH_CLASS);	
-				
+
 				// TAGIT
 				$str = "select * from $this->tagi_ WHERE tlp_rata_id = :id";
 				$sth = $this->db->prepare($str);
 				$sth->bindParam(":id", $id, PDO::PARAM_INT );
 				$sth->execute();
 				$ret["tagit"][$id] = $sth->fetchAll(PDO::FETCH_CLASS);
-				
-				
-				
+
+
+
 			}
 			// SIVUT
 			$str = "select * from $this->sivu_";
 			$sth = $this->db->prepare($str);
 			$sth->execute();
 			$ret["sivut"] = $sth->fetchAll(PDO::FETCH_CLASS);
-			
+
 			echo json_encode($ret);
 		}
-		
+
 		function AddRata( $id )
 		{
 			$str = "select * from $this->rata_ where nimi = :nimi";
-			
+
 			$sth = $this->db->prepare($str);
 			$sth->bindParam(':nimi', $id, PDO::PARAM_STR, 45);
 			$sth->execute();
 			if( $sth->rowCount() != 0)
 				throw new Exception( "paikka $place oli jo olemassa" );
-				
+
 
 			$str = "INSERT INTO $this->rata_ ( nimi ) values ( :nimi )";
 			$sth = $this->db->prepare($str);
@@ -108,7 +108,7 @@
 			if( $sth->rowCount() == 1)
 				echo "success - added $place";
 		}
-		
+
 		function EditRata( $id, $value, $osoite, $desc, $desc_eng)
 		{
 			if( $value == -1 ) // jos value -1 poistetaan annettu $id
@@ -126,8 +126,8 @@
 				$this->DeletePath( $id );
 				$this->DeleteTagit( $id );
 				$this->DeleteRata( $id );
-				
-				
+
+
 			}
 			else
 			{
@@ -152,7 +152,7 @@
 				echo "edit success";
 			}
 		}
-		
+
 		function GetRadat($id) // haetaan lista radoista
 		{
 			$str = "";
@@ -161,7 +161,7 @@
 				$str = "select * from $this->rata_";
 				$sth = $this->db->prepare($str);
 			}
-			
+
 			else
 			{
 				$str = "select * from $this->rata_ WHERE id = :id";
@@ -169,30 +169,30 @@
 				$sth->bindParam(":id", $id, PDO::PARAM_INT);
 			}
 
-			
+
 			$sth->execute();
 			echo json_encode( $sth->fetchAll(PDO::FETCH_CLASS) );			
 		}
-		
+
 		function GetSivut() // haetaan lista radoista
 		{
-			
+
 			$str = "select * from $this->sivu_";
 			$sth = $this->db->prepare($str);
 			$sth->execute();
 			echo json_encode( $sth->fetchAll(PDO::FETCH_CLASS) );			
 		}
-		
+
 		function SaveSivu( $id, $value, $eng, $tunniste )
 		{
-			
+
 			$saveID = -1;
-			
+
 			if( $id == -1 )
 			{
 				$str = "INSERT INTO $this->sivu_ ( nimi ) values ( :tunniste )";
 				$sth = $this->db->prepare($str);
-					
+
 				$sth->bindParam(':tunniste', $tunniste, PDO::PARAM_STR );
 				$sth->execute();
 
@@ -204,35 +204,38 @@
 			else
 			{
 				$str = "UPDATE $this->sivu_ SET nimi=:tunniste WHERE id=:id";
-				
+
 				$sth = $this->db->prepare($str);
 				$sth->bindParam(':id', $id, PDO::PARAM_INT );
 				$sth->bindParam(':tunniste', $tunniste, PDO::PARAM_STR );
 				$sth->execute();
 				$saveID = $id;
-				
+
 				echo $id;
 			}
-			
+
 			if( $saveID > -1 ) // mikäli rivi onnistuttiin lisäämään, tallennetaan tiedostot
 			{
 				if (!file_exists("upload"))
 					mkdir("upload");
-				
+
 				if (!file_exists("upload/$saveID"))
 					mkdir("upload/$saveID");
-				
+
 				file_put_contents( "upload/$saveID/index.html", $value );
 				file_put_contents( "upload/$saveID/index_eng.html", $eng );
-				
+
 			}
 		}
-		
+
 		function SavePath($id, $value)
 		{
-
-			
-			$this->DeletePath($id);
+			file_put_contents("loki.txt", count($value)."\n\n" );
+			file_put_contents("loki.txt", json_encode(end($value))."\n\n", FILE_APPEND );
+			$indx = intval($_REQUEST['index']);
+			$max = intval($_REQUEST["maxindex"]);
+			if( $indx == 0 || !isset($_REQUEST['index']) )
+				$this->DeletePath($id);
 
 			if($value == null)
 				return;
@@ -241,6 +244,8 @@
 
 			for( $i = 0; $i < count($value); ++$i )
 			{
+				if( $value[$i]["lng"] == null)
+					continue;
 				if( $i == 0)
 					$str .= "( :id$i, :lat$i, :lng$i, :alt$i, :dist$i )";
 				else
@@ -248,20 +253,26 @@
 			}
 
 			$sth = $this->db->prepare($str);
-			
+
 
 
 			for( $i = 0; $i < count($value); ++$i )
 			{
+				if( $value[$i]["lng"] == null)
+					continue;
 				$sth->bindParam(":id$i", $id, PDO::PARAM_INT );
 				$sth->bindParam(":lat$i", $value[$i]["lat"], PDO::PARAM_STR );
 				$sth->bindParam(":lng$i", $value[$i]["lng"], PDO::PARAM_STR );
 				$sth->bindParam(":alt$i", $value[$i]["altitude"], PDO::PARAM_STR );
 				$sth->bindParam(":dist$i", $value[$i]["distance"], PDO::PARAM_STR );
 			}	
-			echo $str;
+			if( $indx < $max)
+				echo "plxsend:".$indx+1;
+			else
+				echo "done";
+			file_put_contents("loki.txt", count($str)."\n\n", FILE_APPEND );
 			$sth->execute();
-			
+
 		}
 
 		function GetPath( $id )
@@ -285,16 +296,16 @@
 
 		function SaveTargets($id, $value)
 		{
-			
+
 			$existing = array();
 			foreach( $value as $x ) // poistetaan ne tämän radan kohteet, joita ei ole enää olemassa
 				array_push($existing, $x["id"] );
-			
+
 			$this->DeleteKohde($existing, $id);
 			//echo json_encode($existing);
 
 
-			
+
 			foreach($value as $kohde)
 			{
 				$str = "";
@@ -325,16 +336,16 @@
 							.":color,"
 							.":size)";
 
-					
-					
-					
-					
+
+
+
+
 					$sth = $this->db->prepare($str);
-					
+
 				}
 				else
 				{
-					
+
 					$str = "UPDATE `tlp_kohde`"
 							."SET"
 							."`tlp_rata_id` = :rataID,"
@@ -352,7 +363,7 @@
 					$sth = $this->db->prepare($str);
 					$sth->bindParam(":id", $kohde["id"], PDO::PARAM_INT );
 				}
-				
+
 
 				$sth->bindParam(":rataID", $id, PDO::PARAM_INT );
 				$sth->bindParam(":sivuID", $kohde["sivuID"], PDO::PARAM_INT );
@@ -365,23 +376,23 @@
 				$sth->bindParam(":color", $kohde["color"], PDO::PARAM_STR );
 				$sth->bindParam(":size", $kohde["size"], PDO::PARAM_STR );
 
-				
+
 				$sth->execute();
-				
+
 				echo $sth->rowCount();
 			}
 
 			$this->OfflineMerkit($value);
 			return;
 
-			
-			
-			
+
+
+
 		}
 
 		function GetTargets( $id )
 		{
-			
+
 			if( $id == null)
 			{
 				$str = "select * from $this->kohde_";
@@ -399,7 +410,7 @@
 			}
 		}
 
-		
+
 		function DeleteKohde( $arr, $rataid )
 		{
 
@@ -426,51 +437,51 @@
 				$str = "delete from $this->kohde_ where tlp_rata_id = :id AND id NOT IN $del";
 				$sth = $this->db->prepare($str);
 				$sth->bindParam(':id', $rataid, PDO::PARAM_INT);
-				
+
 			}
 			$sth->execute();
-			
+
 			if( $sth->rowCount() > 0)
 				echo "success - removed kohteet of $id";
-			
+
 		}
-		
+
 		function DeletePath( $id )
 		{
 			$str = "delete from $this->reitti_ where tlp_rata_id = :nimi";
 			$sth = $this->db->prepare($str);
 			$sth->bindParam(':nimi', $id, PDO::PARAM_INT);
 			$sth->execute();
-			
+
 			echo  $sth->rowCount(). " ".$str . $id;
 			if( $sth->rowCount() > 0)
 				return true;
 			else
 				return false;
 		}
-		
+
 		function DeleteTagit( $id )
 		{
 			$str = "delete from $this->tagi_ where tlp_rata_id = :nimi";
 			$sth = $this->db->prepare($str);
 			$sth->bindParam(':nimi', $rataid, PDO::PARAM_INT);
 			$sth->execute();
-			
+
 			if( $sth->rowCount() > 0)
 				echo "success - removed tagit of $id";
-			
+
 		}
-		
+
 		function DeleteSivu( $id )
 		{
 			$str = "delete from $this->sivu_ where id = :nimi";
 			$sth = $this->db->prepare($str);
 			$sth->bindParam(':nimi', $id, PDO::PARAM_INT);
 			$sth->execute();
-			
+
 			if( $sth->rowCount() > 0)
 				echo "success - removed sivu of $id";
-			
+
 		}
 
 		function DeleteRata( $id )
@@ -479,12 +490,12 @@
 			$sth = $this->db->prepare($str);
 			$sth->bindParam(':nimi', $id, PDO::PARAM_INT);
 			$sth->execute();
-			
+
 			if( $sth->rowCount() > 0)
 				echo "success - removed rata of $id";
-			
+
 		}
-		
+
 		function GetTags($id)
 		{
 			$str;
@@ -493,14 +504,14 @@
 			{
 				$str = "select * from $this->tagi_";
 				$sth = $this->db->prepare($str);
-				
+
 			}
 			else
 			{
 				$str = "select * from $this->tagi_ where tlp_rata_id = :id";
 				$sth = $this->db->prepare($str);
 				$sth->bindParam(":id", $id, PDO::PARAM_INT );
-				
+
 			}
 
 			$sth->execute();
@@ -515,7 +526,7 @@
 			$sth->bindParam(":arvo", $value, PDO::PARAM_STR );
 			$sth->execute();
 
-			
+
 		}
 
 		function DeleteTag($id)
@@ -528,7 +539,7 @@
 
 		function GetFiles( $id )
 		{
-			
+
 			if( $id == -1 )
 			{
 				echo json_encode( array() );
@@ -538,14 +549,14 @@
 			{
 				$dir = "upload/$id";
 				$files = array_diff(scandir($dir), array('.','..','Thumbs.db', 'index.html', 'index_eng.html'));
-				
+
 				echo json_encode($files);
 			}
 		}
-		
+
 		function DeleteFile( $id, $value )
 		{
-			
+
 			if( $value == null )
 			{
 				echo "nullissa $id, $value";
@@ -564,8 +575,8 @@
 					}
 				}
 				rmdir($dir);
-				
-				
+
+
 				$this->DeleteSivu( $id );
 			}
 			else
@@ -575,10 +586,10 @@
 					unlink( $dir );
 				echo "poistettiin $value";	
 			}
-			
-			
+
+
 		}
-		
+
 		function SaveFile($id)
 		{
 			$allowedExts = array("gif", "jpeg", "jpg", "png");
@@ -637,7 +648,7 @@
 				$pinBS = "pin-$size-$icon+$visited@2x.png";
 
 				$url = "https://api.tiles.mapbox.com/v3/marker/";
-				
+
 				$this->downloadFile($url.$pinA, $baseUrl.$pinA);
 				$this->downloadFile($url.$pinB, $baseUrl.$pinB); 
 				$this->downloadFile($url.$pinA, $baseUrl.$pinAS);
@@ -674,6 +685,38 @@
 				fclose($newf);
 			}
 		}
+
+
+		function GetOffline()
+		{
+			$ret = array();
+			$ret["markers"] = array();
+			$ret["upload"] = array();
+
+			$markers = "markers/";
+			$upload = "upload/";
+
+			if( file_exists($markers) )
+			{
+				$ret["markers"] = array_diff(scandir($markers), array(".", "..", "Thumbs.db") );
+
+			}
+			if( file_exists($upload) )
+			{
+				$sivut = array_diff(scandir($upload), array(".", "..", "Thumbs.db") );
+				//echo json_encode($sivut);
+				foreach( $sivut as $x )
+				{
+					//echo $x."<hr>";
+					$ret["upload"][$x] = array_diff(scandir($upload.$x), array(".", "..", "Thumbs.db") );
+				}
+			}
+
+			echo json_encode($ret);
+
+		}
+
+		
 	}
 
 ?>
